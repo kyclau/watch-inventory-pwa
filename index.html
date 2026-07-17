@@ -15,7 +15,10 @@
     <div class="app">
         <header class="header">
             <h1>⌚ KL's Watch Cabinet</h1>
-            <button class="btn-add" id="addWatchBtn">+ Add Watch</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-add" id="addWatchBtn">+ Add</button>
+                <button class="btn-sync" id="syncMenuBtn" style="background: #007bff; padding: 10px 15px; border-radius: 8px; border: none; color: white; cursor: pointer;">📤</button>
+            </div>
         </header>
 
         <div class="stats" id="statsBar">
@@ -252,5 +255,34 @@
     </div>
 
     <script src="app.js"></script>
+
+    <!-- SYNC MODAL (BEFORE </body>) -->
+    <div class="modal" id="syncModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sync Data</h2>
+                <button class="close-btn" id="closeSyncModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: #aaa; margin-bottom: 20px; font-size: 13px;">Transfer watches between Chrome Extension and PWA</p>
+                
+                <button class="btn-primary" id="exportPWADataBtn" style="width: 100%; padding: 14px; margin-bottom: 12px; background: #007bff;">📥 Export to JSON</button>
+                
+                <label style="display: block; width: 100%; padding: 14px; background: #28a745; border-radius: 8px; cursor: pointer; text-align: center; color: white; font-weight: 600;">
+                    📤 Import from JSON
+                    <input type="file" id="importPWAFile" accept=".json" style="display: none;">
+                </label>
+                
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255,193,7,0.1); border: 1px solid #ffc107; border-radius: 8px;">
+                    <p style="font-size: 12px; color: #ffc107; margin: 0;">
+                        <strong>How to sync:</strong><br>
+                        1. Export from Chrome Extension<br>
+                        2. Send JSON to iPhone (AirDrop, email, etc.)<br>
+                        3. Import in PWA (or vice versa)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
