@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>KL's Watch Cabinet</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>⌚ KL's Watch Cabinet</h1>
+            <button class="btn-add" id="addWatchBtn">+ Add Watch</button>
+        </header>
+
+        <div class="stats" id="statsBar">
+            <span id="watchCount">0 watches</span>
+        </div>
+
+        <div class="sort-controls">
+            <label>Sort by:</label>
+            <select id="sortField">
+                <option value="savedDate">Saved Date</option>
+                <option value="brand">Brand</option>
+                <option value="year">Year</option>
+            </select>
+            <button class="sort-order-btn" id="sortOrderBtn">Ascending ↑</button>
+        </div>
+
+        <div class="grid" id="watchGrid"></div>
+
+        <div class="empty-state" id="emptyState">
+            <p>No watches yet</p>
+            <button class="btn-primary" id="emptyAddBtn">Add Your First Watch</button>
+        </div>
+    </div>
+
+    <!-- Add/Edit Watch Modal -->
+    <div class="modal" id="watchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Watch</h2>
+                <button class="close-btn" id="closeModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="watchForm">
+                    <input type="hidden" id="watchId">
+                    
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select id="brand">
+                            <option value="">Select...</option>
+                            <option value="G-Shock">G-Shock</option>
+                            <option value="Casio">Casio</option>
+                            <option value="Seiko">Seiko</option>
+                            <option value="Alba">Alba</option>
+                            <option value="Citizen">Citizen</option>
+                            <option value="Armitron">Armitron</option>
+                            <option value="other">Other (specify below)</option>
+                        </select>
+                        <input type="text" id="brandOther" placeholder="Enter brand name" class="hidden">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Model</label>
+                        <input type="text" id="modelName" placeholder="e.g., Submariner" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Module Number</label>
+                            <input type="text" id="moduleNumber" placeholder="e.g., 16613">
+                        </div>
+                        <div class="form-group">
+                            <label>Price</label>
+                            <input type="text" id="price" placeholder="e.g., $12,500">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Currency</label>
+                            <select id="currency">
+                                <option value="HKD">HKD ($)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
+                                <option value="JPY">JPY (¥)</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <input type="text" id="currencyOther" placeholder="Enter currency" class="hidden">
+                        </div>
+                        <div class="form-group">
+                            <label>Case Size</label>
+                            <input type="text" id="caseSize" placeholder="e.g., 40mm">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Case Material</label>
+                            <select id="caseMaterial">
+                                <option value="">Select...</option>
+                                <option value="Resin">Resin</option>
+                                <option value="Stainless Steel">Stainless Steel</option>
+                                <option value="Titanium">Titanium</option>
+                                <option value="Gold">Gold</option>
+                                <option value="Platinum">Platinum</option>
+                                <option value="Bronze">Bronze</option>
+                                <option value="Ceramic">Ceramic</option>
+                                <option value="Carbon Fiber">Carbon Fiber</option>
+                                <option value="other">Other (specify below)</option>
+                            </select>
+                            <input type="text" id="caseMaterialOther" placeholder="Enter material" class="hidden">
+                        </div>
+                        <div class="form-group">
+                            <label>Movement</label>
+                            <select id="movement">
+                                <option value="">Select...</option>
+                                <option value="Automatic">Automatic</option>
+                                <option value="Manual">Manual</option>
+                                <option value="Quartz">Quartz</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Self-winding">Self-winding</option>
+                                <option value="Chronograph">Chronograph</option>
+                                <option value="Solar">Solar</option>
+                                <option value="Kinetic">Kinetic</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Condition</label>
+                            <select id="condition">
+                                <option value="">Select...</option>
+                                <option value="New">New</option>
+                                <option value="Like New">Like New</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Very Good">Very Good</option>
+                                <option value="Good">Good</option>
+                                <option value="Pre-owned">Pre-owned</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Year</label>
+                            <input type="number" id="year" placeholder="e.g., 2020">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Box & Papers</label>
+                        <select id="boxPapers">
+                            <option value="">Select...</option>
+                            <option value="Yes">Yes</option>
+                            <option value="Box Only">Box Only</option>
+                            <option value="Papers Only">Papers Only</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Battery</label>
+                        <select id="battery">
+                            <option value="">Select...</option>
+                            <option value="CR1616">CR1616</option>
+                            <option value="CR1620">CR1620</option>
+                            <option value="CR2016">CR2016</option>
+                            <option value="CR2025">CR2025</option>
+                            <option value="CR2032">CR2032</option>
+                            <option value="CR2430">CR2430</option>
+                            <option value="CR2450">CR2450</option>
+                            <option value="CTL1616F">CTL1616F (Rechargeable)</option>
+                            <option value="SR621SW">SR621SW</option>
+                            <option value="SR626SW">SR626SW</option>
+                            <option value="SR920SW">SR920SW</option>
+                            <option value="SR927W">SR927W</option>
+                            <option value="SR936SW">SR936SW</option>
+                            <option value="Other">Other (specify below)</option>
+                            <option value="Unknown">Unknown</option>
+                        </select>
+                        <input type="text" id="batteryOther" placeholder="Specify battery type" class="hidden">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Seller</label>
+                        <input type="text" id="seller" placeholder="e.g., Chrono24 Dealer">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="location" placeholder="e.g., New York, USA">
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL</label>
+                        <input type="url" id="url" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="description" rows="3" placeholder="Additional notes..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Purchased Date</label>
+                        <input type="date" id="purchasedDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Images</label>
+                        <input type="file" id="images" accept="image/*" multiple>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+                <button type="submit" form="watchForm" class="btn-save">Save Watch</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watch Detail Modal -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="detailTitle">Watch Details</h2>
+                <button class="close-btn" id="closeDetail">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="image-gallery" id="detailGallery">
+                    <img class="gallery-main" id="galleryMain" src="" alt="Watch">
+                    <button class="gallery-nav gallery-prev" id="galleryPrev">‹</button>
+                    <button class="gallery-nav gallery-next" id="galleryNext">›</button>
+                    <div class="gallery-thumbnails" id="galleryThumbnails"></div>
+                    <div class="image-count" id="imageCount"></div>
+                </div>
+
+                <div class="detail-grid" id="detailGrid"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-edit" id="editWatchBtn">Edit</button>
+                <button class="btn-delete" id="deleteWatchBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
