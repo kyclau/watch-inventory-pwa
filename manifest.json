@@ -2,11 +2,12 @@
   "name": "KL's Watch Cabinet",
   "short_name": "Watch Cabinet",
   "description": "Manage your watch collection inventory",
-  "start_url": "/index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
   "orientation": "portrait-primary",
+  "scope": "/watch-inventory-pwa/",
   "icons": [
     {
       "src": "icons/icon-192.png",
