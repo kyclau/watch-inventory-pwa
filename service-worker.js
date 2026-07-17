@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kl-watch-cabinet-v2';  // Changed from v1 to v2
+const CACHE_NAME = 'kl-watch-cabinet-v3';  // Changed from v2 to v3
 const ASSETS = [
     '/',
     '/index.html',
