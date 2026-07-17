@@ -270,6 +270,32 @@ function setupEventListeners() {
     detailModal.addEventListener('click', (e) => {
         if (e.target === detailModal) closeDetailModal();
     });
+    // Sync modal
+    const syncMenuBtn = document.getElementById('syncMenuBtn');
+    const syncModal = document.getElementById('syncModal');
+    const closeSyncModal = document.getElementById('closeSyncModal');
+    const exportPWADataBtn = document.getElementById('exportPWADataBtn');
+    const importPWAFile = document.getElementById('importPWAFile');
+    
+    if (syncMenuBtn) {
+        syncMenuBtn.addEventListener('click', () => syncModal.classList.add('active'));
+    }
+    if (closeSyncModal) {
+        closeSyncModal.addEventListener('click', () => syncModal.classList.remove('active'));
+    }
+    if (exportPWADataBtn) {
+        exportPWADataBtn.addEventListener('click', exportPWAData);
+    }
+    if (importPWAFile) {
+        importPWAFile.addEventListener('change', (e) => importPWAData(e.target.files[0]));
+    }
+    
+    // Close sync modal on outside click
+    if (syncModal) {
+        syncModal.addEventListener('click', (e) => {
+            if (e.target === syncModal) syncModal.classList.remove('active');
+        });
+    }
 }
 
 // Image handling
