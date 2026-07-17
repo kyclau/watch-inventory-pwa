@@ -575,5 +575,70 @@ async function deleteCurrentWatch() {
     }
 }
 
+// EXPORT DATA
+async function exportPWAData() {
+    if (watches.length === 0) {
+        alert('No watches to export!');
+        return;
+    }
+    
+    const exportData = {
+        version: '2026.7.17.1',
+        exportDate: new Date().toISOString(),
+        platform: 'PWA-iOS',
+        watches: watches
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `watch-backup-pwa-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+    alert(`Exported ${watches.length} watches!`);
+}
+
+// IMPORT DATA
+async function importPWAData(file) {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const importData = JSON.parse(e.target.result);
+            
+            if (!importData.watches || !Array.isArray(importData.watches)) {
+                throw new Error('Invalid file format');
+            }
+            
+            const importedWatches = importData.watches;
+            let added = 0;
+            let skipped = 0;
+            
+            for (const watch of importedWatches) {
+                // Check for duplicates by moduleNumber
+                const exists = watches.some(w => w.moduleNumber === watch.moduleNumber);
+                
+                if (!exists) {
+                    await saveWatch(watch);
+                    added++;
+                } else {
+                    skipped++;
+                }
+            }
+            
+            await loadWatches();
+            sortWatches();
+            render();
+            
+            alert(`Imported ${added} new watches! (Skipped ${skipped} duplicates)`);
+        } catch (error) {
+            alert('Import failed: ' + error.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
 // Start the app
 init();
