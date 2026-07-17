@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kl-watch-cabinet-v1';
+const CACHE_NAME = 'kl-watch-cabinet-v2';  // Changed from v1 to v2
 const ASSETS = [
     '/',
     '/index.html',
@@ -14,6 +14,8 @@ self.addEventListener('install', (e) => {
             return cache.addAll(ASSETS);
         })
     );
+    // Force activation
+    self.skipWaiting();
 });
 
 // Activate event
@@ -29,6 +31,8 @@ self.addEventListener('activate', (e) => {
             );
         })
     );
+    // Force claim
+    self.clients.claim();
 });
 
 // Fetch event
