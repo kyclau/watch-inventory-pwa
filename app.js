@@ -55,6 +55,40 @@ async function loadWatches() {
     });
 }
 
+        await loadWatches();
+        
+        // --- MIGRATION: Update old Condition values ---
+        const conditionMap = {
+            'New': 'Brand New',
+            'Like New': 'NOS',
+            'Excellent': 'Used-Excellent',
+            'Very Good': 'Used-Very Good',
+            'Good': 'Used-Good',
+            'Pre-owned': 'Used-Fair' 
+            // Note: You may want to manually review 'Pre-owned' items, mapped to Fair here as default
+        };
+        
+        let needsUpdate = false;
+        for (let watch of watches) {
+            if (conditionMap[watch.condition]) {
+                watch.condition = conditionMap[watch.condition];
+                needsUpdate = true;
+            }
+        }
+        
+        if (needsUpdate) {
+            // Save all updated watches back to DB
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            for (let watch of watches) {
+                store.put(watch);
+            }
+            console.log('Condition values migrated');
+        }
+        // ---------------------------------------------
+
+        sortWatches();
+
 // Save watch
 async function saveWatch(watch) {
     if (!db) await initDB();
