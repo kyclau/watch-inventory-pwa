@@ -55,9 +55,19 @@ async function loadWatches() {
     });
 }
 
+// Save watch  <-- Function definition starts here normally
+async function saveWatch(watch) {
+// ... (rest of saveWatch function)
+
+// ... (skip down to the init function)
+
+// Initialize App
+async function init() {
+    try {
+        await initDB();
         await loadWatches();
         
-        // --- MIGRATION: Update old Condition values ---
+        // --- FIX: Migration code MOVED INSIDE init() ---
         const conditionMap = {
             'New': 'Brand New',
             'Like New': 'NOS',
@@ -65,7 +75,6 @@ async function loadWatches() {
             'Very Good': 'Used-Very Good',
             'Good': 'Used-Good',
             'Pre-owned': 'Used-Fair' 
-            // Note: You may want to manually review 'Pre-owned' items, mapped to Fair here as default
         };
         
         let needsUpdate = false;
@@ -77,17 +86,24 @@ async function loadWatches() {
         }
         
         if (needsUpdate) {
-            // Save all updated watches back to DB
             const transaction = db.transaction([STORE_NAME], 'readwrite');
             const store = transaction.objectStore(STORE_NAME);
             for (let watch of watches) {
                 store.put(watch);
             }
             console.log('Condition values migrated');
+            // Reload to ensure UI has updated data
+            await loadWatches(); 
         }
         // ---------------------------------------------
 
         sortWatches();
+        render();
+        setupEventListeners();
+    } catch (error) {
+        console.error('Init error:', error);
+    }
+}
 
 // Save watch
 async function saveWatch(watch) {
