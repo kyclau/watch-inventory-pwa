@@ -194,14 +194,14 @@ function render() {
             : 'https://placehold.co/400x300?text=No+Image';
         const brand = watch.brand || 'Unknown';
         const model = watch.modelName || 'Unknown';
-        const price = (watch.currency || '') + ' ' + (watch.price || 'N/A');
+        // Price variable removed as it is no longer displayed
         
         return `
             <div class="card" data-id="${watch.id}">
                 <img src="${imgUrl}" alt="${brand} ${model}">
                 <div class="card-info">
-                    <h3>${brand} - ${model}</h3>
-                    <p>${price}</p>
+                    <div class="card-brand">${brand}</div>
+                    <div class="card-model">${model}</div>
                 </div>
             </div>
         `;
