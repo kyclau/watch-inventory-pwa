@@ -347,7 +347,11 @@ function setupEventListeners() {
     // Currency other input toggle
     document.getElementById('currency').addEventListener('change', function() {
         document.getElementById('currencyOther').classList.toggle('hidden', this.value !== 'other');
+        calculateFinalPrice(); // Trigger calculation on currency change
     });
+
+    // Trigger calculation on price input
+    document.getElementById('price').addEventListener('input', calculateFinalPrice);
 
     // Case Material other input toggle
     document.getElementById('caseMaterial').addEventListener('change', function() {
@@ -461,6 +465,7 @@ async function handleFormSubmit(e) {
         moduleNumber: document.getElementById('moduleNumber').value,
         price: document.getElementById('price').value,
         currency: currencyValue,
+        finalPriceHKD: document.getElementById('finalPriceHKD').value,
         caseSize: document.getElementById('caseSize').value,
         year: document.getElementById('year').value,
         caseMaterial: caseMaterialValue,
@@ -521,6 +526,7 @@ async function openDetail(id) {
         { label: 'Model', value: watch.modelName },
         { label: 'Module', value: watch.moduleNumber },
         { label: 'Price', value: (watch.currency || '') + ' ' + (watch.price || '') },
+        { label: 'Final Price (HKD)', value: watch.finalPriceHKD ? `HK$ ${watch.finalPriceHKD}` : '-' }, // Added
         { label: 'Case Size', value: watch.caseSize },
         { label: 'Material', value: watch.caseMaterial },
         { label: 'Movement', value: watch.movement },
@@ -624,6 +630,7 @@ function editCurrentWatch() {
     document.getElementById('modelName').value = watch.modelName || '';
     document.getElementById('moduleNumber').value = watch.moduleNumber || '';
     document.getElementById('price').value = watch.price || '';
+    document.getElementById('finalPriceHKD').value = watch.finalPriceHKD || '';
     
     // Set currency
     const currencySelect = document.getElementById('currency');
