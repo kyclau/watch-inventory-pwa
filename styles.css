@@ -229,7 +229,7 @@ body {
 .close-btn {
     background: none;
     border: none;
-    color: white;
+    color: #C1A981; // Changed from white
     font-size: 24px;
     cursor: pointer;
     padding: 5px;
