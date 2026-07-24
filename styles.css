@@ -260,8 +260,8 @@ body {
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 8px;
     background: #000000; /* Black */
-    border: 1px solid #ffffff; /* White Border */
-    color: #ffffff; /* White Text */
+    border: 1px solid #C1A981; /* Gravy Border */
+    color: #C1A981; /* Gravy Text */
     font-size: 14px;
 }
 
@@ -269,7 +269,7 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #C1A981;
+    border-color: #C1A981; /* Gravy Border */
 }
 
 .form-group .hidden {
