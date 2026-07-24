@@ -45,9 +45,9 @@ body {
 }
 
 .btn-sync {
-    background: #C1A981; /* Changed to Gravy color */
-    color: #000000; /* Black Text for contrast */
-    border: none;
+    background: #C1A981 !important; /* Changed to Gravy color */
+    color: #000000 !important; /* Black Text for contrast */
+    border: none !important;
     padding: 10px 12px; /* Slightly narrower than Add button */
     border-radius: 8px;
     font-size: 14px;
