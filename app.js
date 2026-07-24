@@ -217,11 +217,45 @@ async function init() {
     try {
         await initDB();
         await loadWatches();
+        
+        // ✅ FIX: Migration code MOVED INSIDE init()
+        const conditionMap = {
+            'New': 'Brand New',
+            'Like New': 'NOS',
+            'Excellent': 'Used-Excellent',
+            'Very Good': 'Used-Very Good',
+            'Good': 'Used-Good',
+            'Pre-owned': 'Used-Fair' 
+        };
+        
+        let needsUpdate = false;
+        for (let watch of watches) {
+            if (conditionMap[watch.condition]) {
+                watch.condition = conditionMap[watch.condition];
+                needsUpdate = true;
+            }
+        }
+        
+        if (needsUpdate) {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            for (let watch of watches) {
+                store.put(watch);
+            }
+            console.log('Condition values migrated');
+            // Reload to ensure UI has updated data
+            await loadWatches(); 
+        }
+        // ---------------------------------------------
+
         sortWatches();
         render();
         setupEventListeners();
+        
+        console.log('App initialized successfully'); // Debug log
     } catch (error) {
         console.error('Init error:', error);
+        alert('Error starting app: ' + error.message);
     }
 }
 
