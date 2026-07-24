@@ -366,7 +366,7 @@ function setupEventListeners() {
     // Movement other input toggle
     document.getElementById('movement').addEventListener('change', function() {
         const otherInput = document.getElementById('movementOther');
-        if (this.value === 'Others(Specify)') {
+        if (this.value === 'Others (Specify)') {
             otherInput.classList.remove('hidden');
             otherInput.required = true;
         } else {
@@ -474,7 +474,7 @@ async function handleFormSubmit(e) {
 
     // Add Movement Logic
     let movementValue = document.getElementById('movement').value;
-    if (movementValue === 'Others(Specify)') {
+    if (movementValue === 'Others (Specify)') {
         movementValue = document.getElementById('movementOther').value;
     }
     
@@ -681,11 +681,11 @@ function editCurrentWatch() {
     // Handle Movement Logic
     const movementSelect = document.getElementById('movement');
     const movementOtherInput = document.getElementById('movementOther');
-    const standardMovements = ['Quartz', 'Solar', 'Kinetic', 'Others(Specify)', ''];
+    const standardMovements = ['Quartz', 'Solar', 'Kinetic', 'Others (Specify)', ''];
     
     if (watch.movement && !standardMovements.includes(watch.movement)) {
         // It's a custom value
-        movementSelect.value = 'Others(Specify)';
+        movementSelect.value = 'Others (Specify)';
         movementOtherInput.value = watch.movement;
         movementOtherInput.classList.remove('hidden');
         movementOtherInput.required = true;
@@ -696,8 +696,8 @@ function editCurrentWatch() {
         movementOtherInput.value = '';
         movementOtherInput.required = false;
         
-        // Edge case: if saved literally as "Others(Specify)" without text
-        if (watch.movement === 'Others(Specify)') {
+        // Edge case: if saved literally as "Others (Specify)" without text
+        if (watch.movement === 'Others (Specify)') {
             movementOtherInput.classList.remove('hidden');
             movementOtherInput.required = true;
         }
