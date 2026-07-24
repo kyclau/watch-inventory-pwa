@@ -333,7 +333,7 @@ body {
 }
 
 .btn-delete {
-    background: #C1A981;
+    background: rgba(255,255,255,0.2);
     color: #000000;
 }
 
