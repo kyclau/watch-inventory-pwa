@@ -202,7 +202,7 @@ body {
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    border: 2px solid #e94560;
+    border: 2px solid #C1A981;
 }
 
 .modal-large {
@@ -294,7 +294,7 @@ body {
     height: 60px;
     object-fit: cover;
     border-radius: 5px;
-    border: 2px solid #e94560;
+    border: 2px solid #C1A981;
 }
 
 .modal-actions {
@@ -385,7 +385,7 @@ body {
 }
 
 .gallery-thumbnails img.active {
-    border-color: #e94560;
+    border-color: #C1A981;
     opacity: 1;
 }
 
