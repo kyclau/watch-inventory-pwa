@@ -15,6 +15,68 @@ const STORE_NAME = 'watches';
 
 let db = null;
 
+// --- EXCHANGE RATE LOGIC ---
+let rateCache = { data: null, timestamp: 0 };
+const CACHE_DURATION = 3600000; // 1 hour
+
+async function getExchangeRate(currency) {
+    if (currency === 'HKD') return 1;
+    
+    const now = Date.now();
+    if (rateCache.data && rateCache[currency] && (now - rateCache.timestamp) < CACHE_DURATION) {
+        return rateCache[currency];
+    }
+
+    try {
+        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${currency}`);
+        const data = await response.json();
+        
+        rateCache.timestamp = now;
+        rateCache.data = data.rates;
+        
+        return data.rates['HKD'] || null;
+    } catch (error) {
+        console.error('Error fetching exchange rate:', error);
+        return null;
+    }
+}
+
+async function calculateFinalPrice() {
+    const priceInput = document.getElementById('price').value;
+    const currency = document.getElementById('currency').value;
+    const finalPriceField = document.getElementById('finalPriceHKD');
+    const rateInfo = document.getElementById('rateInfo');
+
+    if (!finalPriceField) return; // Safety check
+
+    const cleanPrice = parseFloat(priceInput.replace(/[^0-9.-]+/g, ""));
+    
+    if (isNaN(cleanPrice) || !currency) {
+        finalPriceField.value = '';
+        if(rateInfo) rateInfo.textContent = '';
+        return;
+    }
+
+    if (currency === 'HKD') {
+        finalPriceField.value = cleanPrice.toLocaleString();
+        if(rateInfo) rateInfo.textContent = 'No conversion needed';
+        return;
+    }
+
+    if(rateInfo) rateInfo.textContent = 'Fetching rate...';
+    const rate = await getExchangeRate(currency);
+
+    if (rate) {
+        const finalPrice = cleanPrice * rate;
+        finalPriceField.value = finalPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        if(rateInfo) rateInfo.textContent = `Rate: 1 ${currency} = ${rate.toFixed(4)} HKD`;
+    } else {
+        finalPriceField.value = 'Error';
+        if(rateInfo) rateInfo.textContent = 'Could not fetch rate';
+    }
+}
+// ---------------------------
+
 // Initialize IndexedDB
 function initDB() {
     return new Promise((resolve, reject) => {
