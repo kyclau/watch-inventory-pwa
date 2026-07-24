@@ -404,20 +404,20 @@ body {
 
 .detail-row {
     background: #000000; /* Black */
-    border: 1px solid #ffffff; /* White Border */
+    border: 1px solid #C1A981; /* White Border */
     padding: 12px;
     border-radius: 8px;
 }
 
 .detail-label {
-    color: #ffffff; /* White */
+    color: #C1A981; /* Gravy */
     font-size: 10px;
     text-transform: uppercase;
     margin-bottom: 4px;
 }
 
 .detail-value {
-    color: white;
+    color: #C1A981; /* Gravy */
     font-size: 13px;
     font-weight: 500;
 }
