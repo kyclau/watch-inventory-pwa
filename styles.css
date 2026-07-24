@@ -272,6 +272,22 @@ body {
     border-color: #C1A981; /* Gravy Border */
 }
 
+#finalPriceHKD {
+    background-color: #1a1a1a !important; /* Slightly lighter black for read-only */
+    border: 1px solid #C1A981;
+    font-weight: 700;
+    color: #ffffff; /* White text for contrast */
+    cursor: not-allowed;
+}
+
+#rateInfo {
+    font-size: 11px;
+    color: #888;
+    font-style: italic;
+    margin-top: 4px;
+    display: block;
+}
+
 .form-group .hidden {
     display: none;
 }
