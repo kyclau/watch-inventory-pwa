@@ -479,7 +479,7 @@ async function openDetail(id) {
         { label: 'Material', value: watch.caseMaterial },
         { label: 'Movement', value: watch.movement },
         { label: 'Condition', value: watch.condition },
-        { label: 'Year', value: watch.year },
+        { label: 'Release Year', value: watch.year },
         { label: 'Box & Papers', value: watch.boxPapers },
         { label: 'Battery', value: watch.battery },
         { label: 'Seller', value: watch.seller },
