@@ -363,6 +363,19 @@ function setupEventListeners() {
         document.getElementById('batteryOther').classList.toggle('hidden', this.value !== 'Other');
     });
 
+    // Movement other input toggle
+    document.getElementById('movement').addEventListener('change', function() {
+        const otherInput = document.getElementById('movementOther');
+        if (this.value === 'Others(Specify)') {
+            otherInput.classList.remove('hidden');
+            otherInput.required = true;
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.required = false;
+            otherInput.value = '';
+        }
+    });
+
     // Close modal on outside click
     watchModal.addEventListener('click', (e) => {
         if (e.target === watchModal) closeAddModal();
@@ -459,6 +472,12 @@ async function handleFormSubmit(e) {
         batteryValue = document.getElementById('batteryOther').value;
     }
 
+    // Add Movement Logic
+    let movementValue = document.getElementById('movement').value;
+    if (movementValue === 'Others(Specify)') {
+        movementValue = document.getElementById('movementOther').value;
+    }
+    
     const watch = {
         brand: brandValue,
         modelName: document.getElementById('modelName').value,
@@ -469,7 +488,7 @@ async function handleFormSubmit(e) {
         caseSize: document.getElementById('caseSize').value,
         year: document.getElementById('year').value,
         caseMaterial: caseMaterialValue,
-        movement: document.getElementById('movement').value,
+        movement: movementValue, // Use the variable instead of direct access
         condition: document.getElementById('condition').value,
         boxPapers: document.getElementById('boxPapers').value,
         battery: batteryValue,
@@ -659,7 +678,30 @@ function editCurrentWatch() {
         document.getElementById('caseMaterialOther').value = watch.caseMaterial || '';
     }
 
-    document.getElementById('movement').value = watch.movement || '';
+    // Handle Movement Logic
+    const movementSelect = document.getElementById('movement');
+    const movementOtherInput = document.getElementById('movementOther');
+    const standardMovements = ['Quartz', 'Solar', 'Kinetic', 'Others(Specify)', ''];
+    
+    if (watch.movement && !standardMovements.includes(watch.movement)) {
+        // It's a custom value
+        movementSelect.value = 'Others(Specify)';
+        movementOtherInput.value = watch.movement;
+        movementOtherInput.classList.remove('hidden');
+        movementOtherInput.required = true;
+    } else {
+        // It's a standard value
+        movementSelect.value = watch.movement || '';
+        movementOtherInput.classList.add('hidden');
+        movementOtherInput.value = '';
+        movementOtherInput.required = false;
+        
+        // Edge case: if saved literally as "Others(Specify)" without text
+        if (watch.movement === 'Others(Specify)') {
+            movementOtherInput.classList.remove('hidden');
+            movementOtherInput.required = true;
+        }
+    }
     document.getElementById('condition').value = watch.condition || '';
     document.getElementById('boxPapers').value = watch.boxPapers || '';
 
