@@ -8,7 +8,7 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background: #000000; /* Pure Black Background */
-    color: #ffffff; /* Pure White Text */
+    color: #C1A981; /* Gravy Text */
     /* ... */
 }
 
@@ -30,11 +30,11 @@ body {
 /* AFTER */
 .header h1 {
     font-size: 24px;
-    color: #ffffff; /* White */
+    color: #C1A981; /* Gravy */
 }
 
 .btn-add {
-    background: #ffffff; /* White Background */
+    background: #C1A981; /* Gravy Background */
     color: #000000; /* Black Text */
     border: none;
     padding: 10px 20px;
@@ -46,12 +46,12 @@ body {
 
 .stats {
     background: #000000; /* Black Background */
-    border: 1px solid #ffffff; /* White Border */
+    border: 1px solid #C1A981; /* Gravy Border */
     border-radius: 8px;
     padding: 10px 15px;
     margin-bottom: 20px;
     font-size: 14px;
-    color: #ffffff; /* White Text */
+    color: #C1A981; /* Gravy Text */
 }
 
 .sort-controls {
@@ -61,12 +61,12 @@ body {
     margin-bottom: 20px;
     padding: 10px 15px;
     background: #000000; /* Black Background */
-    border: 1px solid #ffffff; /* Add White Border */
+    border: 1px solid #C1A981; /* Add Gravy Border */
     border-radius: 8px;
 }
 
 .sort-controls label {
-    color: #ffffff; /* White */
+    color: #C1A981; /* Gravy */
     font-size: 12px;
 }
 
@@ -75,8 +75,8 @@ body {
     border-radius: 5px;
     border: 1px solid rgba(255,255,255,0.2);
     background: #000000; /* Black */
-    border: 1px solid #ffffff; /* White Border */
-    color: #ffffff; /* White Text */
+    border: 1px solid #C1A981; /* Gravy Border */
+    color: #C1A981; /* Gravy Text */
     font-size: 13px;
 }
 
@@ -85,8 +85,8 @@ body {
     border-radius: 5px;
     border: 1px solid rgba(255,255,255,0.2);
     background: #000000; /* Black */
-    border: 1px solid #ffffff; /* White Border */
-    color: #ffffff; /* White Text */
+    border: 1px solid #C1A981; /* Gravy Border */
+    color: #C1A981; /* Gravy Text */
     font-size: 13px;
     cursor: pointer;
 }
@@ -99,7 +99,7 @@ body {
 
 .card {
     background: #000000; /* Black Background */
-    border: 1px solid #ffffff; /* White Border */
+    border: 1px solid #C1A981; /* Gravy Border */
     color: white;
     border-radius: 10px;
     overflow: hidden;
