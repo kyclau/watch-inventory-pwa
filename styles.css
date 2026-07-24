@@ -7,10 +7,9 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: white;
-    min-height: 100vh;
-    padding-bottom: 40px;
+    background: #000000; /* Pure Black Background */
+    color: #ffffff; /* Pure White Text */
+    /* ... */
 }
 
 .app {
@@ -28,14 +27,15 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
+/* AFTER */
 .header h1 {
     font-size: 24px;
-    color: #e94560;
+    color: #ffffff; /* White */
 }
 
 .btn-add {
-    background: #28a745;
-    color: white;
+    background: #ffffff; /* White Background */
+    color: #000000; /* Black Text */
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -45,13 +45,13 @@ body {
 }
 
 .stats {
-    background: rgba(255,193,7,0.2);
-    border: 1px solid #ffc107;
+    background: #000000; /* Black Background */
+    border: 1px solid #ffffff; /* White Border */
     border-radius: 8px;
     padding: 10px 15px;
     margin-bottom: 20px;
     font-size: 14px;
-    color: #ffc107;
+    color: #ffffff; /* White Text */
 }
 
 .sort-controls {
@@ -60,12 +60,13 @@ body {
     gap: 10px;
     margin-bottom: 20px;
     padding: 10px 15px;
-    background: rgba(255,255,255,0.05);
+    background: #000000; /* Black Background */
+    border: 1px solid #ffffff; /* Add White Border */
     border-radius: 8px;
 }
 
 .sort-controls label {
-    color: #aaa;
+    color: #ffffff; /* White */
     font-size: 12px;
 }
 
@@ -73,8 +74,9 @@ body {
     padding: 8px 12px;
     border-radius: 5px;
     border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.1);
-    color: white;
+    background: #000000; /* Black */
+    border: 1px solid #ffffff; /* White Border */
+    color: #ffffff; /* White Text */
     font-size: 13px;
 }
 
@@ -82,8 +84,9 @@ body {
     padding: 8px 12px;
     border-radius: 5px;
     border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.1);
-    color: white;
+    background: #000000; /* Black */
+    border: 1px solid #ffffff; /* White Border */
+    color: #ffffff; /* White Text */
     font-size: 13px;
     cursor: pointer;
 }
@@ -95,8 +98,9 @@ body {
 }
 
 .card {
-    background: #808080; /* Mid-grey */
-    color: white; /* Changed text to white for contrast */
+    background: #000000; /* Black Background */
+    border: 1px solid #ffffff; /* White Border */
+    color: white;
     border-radius: 10px;
     overflow: hidden;
     cursor: pointer;
@@ -124,15 +128,15 @@ body {
 .card-brand {
     font-size: 12px;
     font-weight: 700;
-    color: #e94560; /* Match your theme accent color */
+    color: #ffffff; /* White */
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .card-model {
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
+    font-size: 11px; /* Smaller font as requested */
+    font-weight: 400; /* Lighter weight */
+    color: #ffffff; /* White */
     line-height: 1.3;
     word-wrap: break-word; 
 }
@@ -142,7 +146,7 @@ body {
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #aaa;
+    color: #ffffff;
 }
 
 .empty-state p {
@@ -151,8 +155,9 @@ body {
 }
 
 .btn-primary {
-    background: #28a745;
-    color: white;
+    background: #ffffff; /* White */
+    color: #000000; /* Black Text */
+    border: 1px solid #ffffff; /* Optional White Border */
     border: none;
     padding: 12px 30px;
     border-radius: 8px;
@@ -204,7 +209,7 @@ body {
 }
 
 .modal-header h2 {
-    color: #e94560;
+    color: #ffffff; /* White */
     font-size: 18px;
 }
 
@@ -228,7 +233,7 @@ body {
 
 .form-group label {
     display: block;
-    color: #aaa;
+    color: #ffffff; /* White */
     font-size: 12px;
     text-transform: uppercase;
     margin-bottom: 5px;
@@ -241,8 +246,9 @@ body {
     padding: 12px;
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 8px;
-    background: rgba(255,255,255,0.1);
-    color: white;
+    background: #000000; /* Black */
+    border: 1px solid #ffffff; /* White Border */
+    color: #ffffff; /* White Text */
     font-size: 14px;
 }
 
@@ -384,13 +390,14 @@ body {
 }
 
 .detail-row {
-    background: rgba(255,255,255,0.05);
+    background: #000000; /* Black */
+    border: 1px solid #ffffff; /* White Border */
     padding: 12px;
     border-radius: 8px;
 }
 
 .detail-label {
-    color: #aaa;
+    color: #ffffff; /* White */
     font-size: 10px;
     text-transform: uppercase;
     margin-bottom: 4px;
