@@ -328,13 +328,13 @@ body {
 }
 
 .btn-edit {
-    background: #007bff;
-    color: white;
+    background: #C1A981;
+    color: #000000;
 }
 
 .btn-delete {
-    background: #dc3545;
-    color: white;
+    background: #C1A981;
+    color: #000000;
 }
 
 /* Detail View */
