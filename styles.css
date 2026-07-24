@@ -269,7 +269,7 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #e94560;
+    border-color: #C1A981;
 }
 
 .form-group .hidden {
