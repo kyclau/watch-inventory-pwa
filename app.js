@@ -183,13 +183,30 @@ function sortWatches() {
     sortedWatches.sort((a, b) => {
         let valA, valB;
         
-        if (sortField === 'brand') {
-            valA = (a.brand || '').toLowerCase();
-            valB = (b.brand || '').toLowerCase();
-        } else if (sortField === 'year') {
+        if (sortField === 'brandModel') {
+            // Combine Brand and Model for sorting
+            valA = ((a.brand || '') + ' ' + (a.modelName || '')).toLowerCase();
+            valB = ((b.brand || '') + ' ' + (b.modelName || '')).toLowerCase();
+        } 
+        else if (sortField === 'finalPriceHKD') {
+            // Parse price string to number (remove commas, HK$, etc.)
+            const parsePrice = (p) => {
+                if (!p) return 0;
+                return parseFloat(p.toString().replace(/[^0-9.-]+/g, "")) || 0;
+            };
+            valA = parsePrice(a.finalPriceHKD);
+            valB = parsePrice(b.finalPriceHKD);
+        } 
+        else if (sortField === 'purchasedDate') {
+            valA = parseDate(a.purchasedDate);
+            valB = parseDate(b.purchasedDate);
+        } 
+        else if (sortField === 'year') {
             valA = parseInt(a.year) || 0;
             valB = parseInt(b.year) || 0;
-        } else {
+        } 
+        else {
+            // Fallback to savedDate
             valA = parseDate(a.savedDate);
             valB = parseDate(b.savedDate);
         }
@@ -333,8 +350,13 @@ function setupEventListeners() {
     });
 
     sortOrderBtn.addEventListener('click', function() {
+        // Toggle order
         sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-        this.textContent = sortOrder === 'asc' ? 'Ascending ↑' : 'Descending ↓';
+        
+        // Update button icon only (No text)
+        // Up arrow (↑) for Ascending, Down arrow (↓) for Descending
+        this.textContent = sortOrder === 'asc' ? '↑' : '↓';
+        
         sortWatches();
         render();
     });
