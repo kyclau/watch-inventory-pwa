@@ -794,8 +794,7 @@ async function handleFormSubmit(e) {
     try {
         await saveWatch(watch);
         await loadWatches();
-        sortWatches();
-        render();
+        refreshView();
         closeAddModal();
     } catch (error) {
         console.error('Save error:', error);
@@ -1032,8 +1031,7 @@ async function deleteCurrentWatch() {
         try {
             await deleteWatch(currentWatchId);
             await loadWatches();
-            sortWatches();
-            render();
+            refreshView();
             closeDetailModal();
         } catch (error) {
             console.error('Delete error:', error);
@@ -1096,8 +1094,7 @@ async function importPWAData(file) {
             }
             
             await loadWatches();
-            sortWatches();
-            render();
+            refreshView();
             
             alert(`Imported ${added} new watches! (Skipped ${skipped} duplicates)`);
         } catch (error) {
