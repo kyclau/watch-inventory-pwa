@@ -411,7 +411,15 @@ sortOrderBtn.addEventListener('click', function() {
 
     // Brand other input toggle
     document.getElementById('brand').addEventListener('change', function() {
-        document.getElementById('brandOther').classList.toggle('hidden', this.value !== 'other');
+        const otherInput = document.getElementById('brandOther');
+        if (this.value === 'Others (Specify)') {
+            otherInput.classList.remove('hidden');
+            otherInput.required = true;
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.required = false;
+            otherInput.value = '';
+        }
     });
 
     // Currency other input toggle
@@ -523,7 +531,7 @@ async function handleFormSubmit(e) {
     e.preventDefault();
 
     let brandValue = document.getElementById('brand').value;
-    if (brandValue === 'other') {
+    if (brandValue === 'Others (Specify)') {
         brandValue = document.getElementById('brandOther').value;
     }
 
@@ -706,14 +714,27 @@ function editCurrentWatch() {
     
     // Set brand
     const brandSelect = document.getElementById('brand');
-    const knownBrands = ['G-Shock', 'Casio', 'Seiko', 'Alba', 'Citizen', 'Armitron'];
+    const brandOtherInput = document.getElementById('brandOther');
+    const knownBrands = ['G-Shock', 'Casio', 'Seiko', 'Alba', 'Citizen', 'Armitron', 'Others (Specify)'];
+    
     if (knownBrands.includes(watch.brand)) {
+        // If it's a known brand (including the literal string "Others (Specify)")
         brandSelect.value = watch.brand;
-        document.getElementById('brandOther').classList.add('hidden');
+        if (watch.brand === 'Others (Specify)') {
+            // Edge case: if they literally saved it as "Others (Specify)" without custom text
+            brandOtherInput.classList.remove('hidden');
+            brandOtherInput.required = true;
+        } else {
+            brandOtherInput.classList.add('hidden');
+            brandOtherInput.required = false;
+            brandOtherInput.value = '';
+        }
     } else {
-        brandSelect.value = 'other';
-        document.getElementById('brandOther').classList.remove('hidden');
-        document.getElementById('brandOther').value = watch.brand || '';
+        // It's a custom brand not in the list
+        brandSelect.value = 'Others (Specify)';
+        brandOtherInput.value = watch.brand || '';
+        brandOtherInput.classList.remove('hidden');
+        brandOtherInput.required = true;
     }
 
     document.getElementById('modelName').value = watch.modelName || '';
