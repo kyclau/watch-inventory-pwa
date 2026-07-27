@@ -708,17 +708,110 @@ let selectedImages = [];
 
 async function handleImageSelect(e) {
     const files = e.target.files;
-    selectedImages = [];
-    imagePreview.innerHTML = '';
+    // ✅ Do NOT clear selectedImages here if editing an existing watch with images
+    // We only clear if it's a brand new watch (handled in openAddModal)
+    
+    // Clear input value so selecting the same file again triggers change event
+    e.target.value = ''; 
 
     for (let i = 0; i < files.length; i++) {
         const base64 = await fileToBase64(files[i]);
-        selectedImages.push(base64);
-        
-        const img = document.createElement('img');
-        img.src = base64;
-        imagePreview.appendChild(img);
+        selectedImages.push(base64); // ✅ Appends to existing array
     }
+    
+    renderImagePreview(); // ✅ Use a dedicated render function
+}
+
+// ✅ NEW: Helper to render the preview with delete/reorder buttons
+function renderImagePreview() {
+    imagePreview.innerHTML = '';
+    selectedImages.forEach((imgSrc, index) => {
+        const container = document.createElement('div');
+        container.style.position = 'relative';
+        container.style.marginRight = '10px';
+        container.style.marginBottom = '10px';
+        container.style.cursor = 'grab';
+        container.dataset.index = index;
+
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.style.width = '60px';
+        img.style.height = '60px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '5px';
+        img.style.border = '2px solid #C1A981';
+        img.style.pointerEvents = 'none'; // Let container handle drag
+        
+        // Delete Button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '×';
+        deleteBtn.style.position = 'absolute';
+        deleteBtn.style.top = '-5px';
+        deleteBtn.style.right = '-5px';
+        deleteBtn.style.background = '#F21E4A';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '50%';
+        deleteBtn.style.width = '20px';
+        deleteBtn.style.height = '20px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.fontSize = '14px';
+        deleteBtn.style.lineHeight = '1';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            selectedImages.splice(index, 1);
+            renderImagePreview();
+        };
+
+        container.appendChild(img);
+        container.appendChild(deleteBtn);
+        
+        // Add Drag Events
+        container.draggable = true;
+        container.addEventListener('dragstart', handleDragStart);
+        container.addEventListener('dragover', handleDragOver);
+        container.addEventListener('drop', handleDrop);
+        container.addEventListener('dragend', handleDragEnd);
+
+        imagePreview.appendChild(container);
+    });
+}
+
+// ✅ NEW: Drag and Drop Logic
+let dragSrcIndex = null;
+
+function handleDragStart(e) {
+    dragSrcIndex = this.dataset.index;
+    this.style.opacity = '0.4';
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+}
+
+function handleDragOver(e) {
+    if (e.preventDefault) e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+function handleDrop(e) {
+    if (e.stopPropagation) e.stopPropagation();
+    const dragTargetIndex = this.dataset.index;
+
+    if (dragSrcIndex !== dragTargetIndex) {
+        // Swap images in array
+        const temp = selectedImages[dragSrcIndex];
+        selectedImages[dragSrcIndex] = selectedImages[dragTargetIndex];
+        selectedImages[dragTargetIndex] = temp;
+        
+        renderImagePreview();
+    }
+    return false;
+}
+
+function handleDragEnd() {
+    this.style.opacity = '1';
+    const items = document.querySelectorAll('#imagePreview div');
+    items.forEach(item => item.style.opacity = '1');
 }
 
 // Open Add Modal
@@ -795,9 +888,11 @@ async function handleFormSubmit(e) {
 
     if (editingWatchId) {
         watch.id = editingWatchId;
-        const existing = watches.find(w => w.id === editingWatchId);
-        if (existing && existing.images && selectedImages.length === 0) {
-            watch.images = existing.images;
+        // ✅ Always use the current state of selectedImages (which now holds old + new)
+        // No need to check length === 0 anymore because we loaded them in editCurrentWatch
+        if (!watch.images || watch.images.length === 0) {
+             const existing = watches.find(w => w.id === editingWatchId);
+             if (existing) watch.images = existing.images;
         }
     }
 
@@ -1040,8 +1135,9 @@ function editCurrentWatch() {
     document.getElementById('description').value = watch.description || '';
     document.getElementById('purchasedDate').value = watch.purchasedDate || '';
 
-    selectedImages = [];
-    imagePreview.innerHTML = '';
+    // ✅ Load existing images if they exist
+    selectedImages = watch.images || [];
+    renderImagePreview(); // ✅ Render them immediately
     watchModal.classList.add('active');
 }
 
