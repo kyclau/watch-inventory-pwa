@@ -182,38 +182,65 @@ function sortWatches() {
     
     sortedWatches.sort((a, b) => {
         let valA, valB;
+        let result = 0;
         
         if (sortField === 'brandModel') {
-            // Combine Brand and Model for sorting
-            valA = ((a.brand || '') + ' ' + (a.modelName || '')).toLowerCase();
-            valB = ((b.brand || '') + ' ' + (b.modelName || '')).toLowerCase();
+            // LEVEL 1: Sort by Brand
+            const brandA = (a.brand || '').toLowerCase();
+            const brandB = (b.brand || '').toLowerCase();
+            
+            if (brandA < brandB) result = -1;
+            else if (brandA > brandB) result = 1;
+            else {
+                // LEVEL 2: If Brands are equal, sort by Model
+                const modelA = (a.modelName || '').toLowerCase();
+                const modelB = (b.modelName || '').toLowerCase();
+                
+                if (modelA < modelB) result = -1;
+                else if (modelA > modelB) result = 1;
+                else result = 0;
+            }
         } 
         else if (sortField === 'finalPriceHKD') {
-            // Parse price string to number (remove commas, HK$, etc.)
+            // Parse price string to number
             const parsePrice = (p) => {
                 if (!p) return 0;
                 return parseFloat(p.toString().replace(/[^0-9.-]+/g, "")) || 0;
             };
             valA = parsePrice(a.finalPriceHKD);
             valB = parsePrice(b.finalPriceHKD);
+            
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
         } 
         else if (sortField === 'purchasedDate') {
             valA = parseDate(a.purchasedDate);
             valB = parseDate(b.purchasedDate);
+            
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
         } 
         else if (sortField === 'year') {
             valA = parseInt(a.year) || 0;
             valB = parseInt(b.year) || 0;
+            
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
         } 
         else {
-            // Fallback to savedDate
+            // Fallback
             valA = parseDate(a.savedDate);
             valB = parseDate(b.savedDate);
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
         }
         
-        if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-        if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
+        // Apply Ascending/Descending direction
+        return sortOrder === 'asc' ? result : -result;
     });
 }
 
@@ -349,17 +376,20 @@ function setupEventListeners() {
         render();
     });
 
-    sortOrderBtn.addEventListener('click', function() {
-        // Toggle order
-        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-        
-        // Update button icon only (No text)
-        // Up arrow (↑) for Ascending, Down arrow (↓) for Descending
-        this.textContent = sortOrder === 'asc' ? '↑' : '↓';
-        
-        sortWatches();
-        render();
-    });
+sortOrderBtn.addEventListener('click', function() {
+    // Toggle order
+    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    
+    // Update button to show ONLY the arrow icon
+    if (sortOrder === 'asc') {
+        this.textContent = '↑'; // Up arrow for Ascending
+    } else {
+        this.textContent = '↓'; // Down arrow for Descending
+    }
+    
+    sortWatches();
+    render();
+});
 
     // Brand other input toggle
     document.getElementById('brand').addEventListener('change', function() {
