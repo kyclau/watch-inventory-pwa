@@ -710,17 +710,30 @@ let selectedImages = [];
 async function handleImageSelect(e) {
     const files = e.target.files;
     
-    // CRITICAL: Reset input so selecting same file works again
+    // Reset input
     e.target.value = ''; 
 
     if (!files || files.length === 0) return;
 
+    // ✅ VISUAL CONFIRMATION: If you see this alert, the code IS running
+    alert(`Adding ${files.length} new image(s)... Total will be: ${selectedImages.length + files.length}`);
+
     for (let i = 0; i < files.length; i++) {
-        const base64 = await fileToBase64(files[i]);
-        selectedImages.push(base64);
+        try {
+            const base64 = await fileToBase64(files[i]);
+            selectedImages.push(base64);
+        } catch (err) {
+            console.error('Error converting file:', err);
+            alert('Error converting image: ' + err.message);
+            return;
+        }
     }
     
-    renderImagePreview();
+    // Force a tiny delay to ensure DOM is ready
+    setTimeout(() => {
+        renderImagePreview();
+        console.log('Preview rendered. Count:', selectedImages.length);
+    }, 100);
 }
 
 // ✅ NEW: Helper to render the preview with delete/reorder buttons
@@ -1155,11 +1168,15 @@ function editCurrentWatch() {
     document.getElementById('description').value = watch.description || '';
     document.getElementById('purchasedDate').value = watch.purchasedDate || '';
 
-    // ✅ Load existing images if they exist
+    // ✅ CRITICAL: Load existing images from the database object
     selectedImages = watch.images || [];
+    
+    console.log('Edit Mode: Loaded', selectedImages.length, 'existing images.');
+
+    // ✅ Render them immediately
     renderImagePreview();
     
-    // ✅ Reset file input so user can re-select files if needed
+    // Reset file input
     const imagesInput = document.getElementById('images');
     if (imagesInput) imagesInput.value = '';
     
