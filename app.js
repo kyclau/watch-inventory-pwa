@@ -547,7 +547,6 @@ function setupEventListeners() {
     document.getElementById('galleryNext').addEventListener('click', nextImage);
 
     watchForm.addEventListener('submit', handleFormSubmit);
-    imagesInput.addEventListener('change', handleImageSelect);
 
     sortFieldSelect.addEventListener('change', function() {
         sortField = this.value;
@@ -709,30 +708,34 @@ let selectedImages = [];
 
 // ✅ FIXED: Single, clean function
 async function handleImageSelect(e) {
+    // When called from HTML onchange, 'e' is the event object
     const files = e.target.files;
     
-    // CRITICAL: Reset input so selecting the same file works again
+    console.log('📸 FILE SELECTED! Files found:', files ? files.length : 0);
+
+    if (!files || files.length === 0) {
+        console.log('⚠️ No files in event.');
+        return;
+    }
+
+    // Reset input immediately so the same file can be selected again later
     e.target.value = ''; 
 
-    if (!files || files.length === 0) return;
-
-    // Optional: Alert to confirm it's running (you can remove this later)
-    // alert(`Adding ${files.length} new image(s)...`);
+    console.log(`✅ Processing ${files.length} new file(s)...`);
 
     for (let i = 0; i < files.length; i++) {
         try {
             const base64 = await fileToBase64(files[i]);
             selectedImages.push(base64);
+            console.log(`➕ Added image. Total: ${selectedImages.length}`);
         } catch (err) {
-            console.error('Error converting file:', err);
-            alert('Error converting image: ' + err.message);
-            return;
+            console.error('❌ Error converting file:', err);
         }
     }
     
-    // Render immediately
+    // Render
     renderImagePreview();
-    console.log('Images updated. Total count:', selectedImages.length);
+    console.log('🎨 Preview rendered.');
 }
 
 // ✅ NEW: Helper to render the preview with delete/reorder buttons
