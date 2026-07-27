@@ -706,23 +706,6 @@ function setupEventListeners() {
 // Image handling
 let selectedImages = [];
 
-async function handleImageSelect(e) {
-    const files = e.target.files;
-
-        // ✅ CRITICAL: Reset the input value immediately so selecting the same file triggers change again
-    e.target.value = ''; 
-
-    if (!files || files.length === 0) return;
-
-    // Process new files
-    for (let i = 0; i < files.length; i++) {
-        const base64 = await fileToBase64(files[i]);
-        selectedImages.push(base64);
-    }
-    
-// Image handling
-let selectedImages = [];
-
 // ✅ FIXED: Single, clean function
 async function handleImageSelect(e) {
     const files = e.target.files;
@@ -737,12 +720,19 @@ async function handleImageSelect(e) {
         selectedImages.push(base64);
     }
     
-    renderImagePreview(); // ✅ Use a dedicated render function
+    renderImagePreview();
 }
 
 // ✅ NEW: Helper to render the preview with delete/reorder buttons
 function renderImagePreview() {
+    if (!imagePreview) return;
+    
     imagePreview.innerHTML = '';
+    
+    if (selectedImages.length === 0) {
+        return; 
+    }
+
     selectedImages.forEach((imgSrc, index) => {
         const container = document.createElement('div');
         container.style.position = 'relative';
@@ -758,9 +748,8 @@ function renderImagePreview() {
         img.style.objectFit = 'cover';
         img.style.borderRadius = '5px';
         img.style.border = '2px solid #C1A981';
-        img.style.pointerEvents = 'none'; // Let container handle drag
+        img.style.pointerEvents = 'none'; 
         
-        // Delete Button
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = '×';
         deleteBtn.style.position = 'absolute';
@@ -775,6 +764,10 @@ function renderImagePreview() {
         deleteBtn.style.cursor = 'pointer';
         deleteBtn.style.fontSize = '14px';
         deleteBtn.style.lineHeight = '1';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        
         deleteBtn.onclick = (e) => {
             e.stopPropagation();
             selectedImages.splice(index, 1);
@@ -784,7 +777,6 @@ function renderImagePreview() {
         container.appendChild(img);
         container.appendChild(deleteBtn);
         
-        // Add Drag Events
         container.draggable = true;
         container.addEventListener('dragstart', handleDragStart);
         container.addEventListener('dragover', handleDragOver);
@@ -795,7 +787,7 @@ function renderImagePreview() {
     });
 }
 
-// ✅ NEW: Drag and Drop Logic
+// ✅ NEW: Drag and Drop Logic Variables
 let dragSrcIndex = null;
 
 function handleDragStart(e) {
@@ -814,13 +806,10 @@ function handleDragOver(e) {
 function handleDrop(e) {
     if (e.stopPropagation) e.stopPropagation();
     const dragTargetIndex = this.dataset.index;
-
     if (dragSrcIndex !== dragTargetIndex) {
-        // Swap images in array
         const temp = selectedImages[dragSrcIndex];
         selectedImages[dragSrcIndex] = selectedImages[dragTargetIndex];
         selectedImages[dragTargetIndex] = temp;
-        
         renderImagePreview();
     }
     return false;
@@ -831,7 +820,6 @@ function handleDragEnd() {
     const items = document.querySelectorAll('#imagePreview div');
     items.forEach(item => item.style.opacity = '1');
 }
-
 // Open Add Modal
 function openAddModal() {
     editingWatchId = null;
