@@ -637,8 +637,17 @@ function setupEventListeners() {
     document.getElementById('price').addEventListener('input', calculateFinalPrice);
 
     // Case Material other input toggle
+    // Case Material other input toggle
     document.getElementById('caseMaterial').addEventListener('change', function() {
-        document.getElementById('caseMaterialOther').classList.toggle('hidden', this.value !== 'other');
+        const otherInput = document.getElementById('caseMaterialOther');
+        if (this.value === 'Other (Specify)') {
+            otherInput.classList.remove('hidden');
+            otherInput.required = true;
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.required = false;
+            otherInput.value = '';
+        }
     });
 
     // Battery other input toggle
@@ -746,7 +755,8 @@ async function handleFormSubmit(e) {
     }
 
     let caseMaterialValue = document.getElementById('caseMaterial').value;
-    if (caseMaterialValue === 'other') {
+    // Check for the exact string "Other (Specify)"
+    if (caseMaterialValue === 'Other (Specify)') {
         caseMaterialValue = document.getElementById('caseMaterialOther').value;
     }
 
@@ -963,14 +973,26 @@ function editCurrentWatch() {
 
     // Set case material
     const materialSelect = document.getElementById('caseMaterial');
-    const knownMaterials = ['Resin', 'Stainless Steel', 'Titanium', 'Gold', 'Platinum', 'Bronze', 'Ceramic', 'Carbon Fiber'];
+    // Updated list to match new options
+    const knownMaterials = ['Resin', 'Stainless Steel', 'Silver Plated', 'Gold Plated', 'Plastic', 'Carbon Fiber', 'Other (Specify)'];
+    
     if (knownMaterials.includes(watch.caseMaterial)) {
         materialSelect.value = watch.caseMaterial;
-        document.getElementById('caseMaterialOther').classList.add('hidden');
+        // If explicitly "Other (Specify)", show the input
+        if (watch.caseMaterial === 'Other (Specify)') {
+             document.getElementById('caseMaterialOther').classList.remove('hidden');
+             document.getElementById('caseMaterialOther').required = true;
+        } else {
+             document.getElementById('caseMaterialOther').classList.add('hidden');
+             document.getElementById('caseMaterialOther').required = false;
+             document.getElementById('caseMaterialOther').value = '';
+        }
     } else {
-        materialSelect.value = 'other';
+        // Custom value not in list -> Select "Other (Specify)" and fill input
+        materialSelect.value = 'Other (Specify)';
         document.getElementById('caseMaterialOther').classList.remove('hidden');
         document.getElementById('caseMaterialOther').value = watch.caseMaterial || '';
+        document.getElementById('caseMaterialOther').required = true;
     }
 
     // Handle Movement Logic
