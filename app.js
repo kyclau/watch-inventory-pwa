@@ -720,17 +720,21 @@ async function handleImageSelect(e) {
         selectedImages.push(base64);
     }
     
-    renderImagePreview();
-}
-    // ✅ Do NOT clear selectedImages here if editing an existing watch with images
-    // We only clear if it's a brand new watch (handled in openAddModal)
+// Image handling
+let selectedImages = [];
+
+// ✅ FIXED: Single, clean function
+async function handleImageSelect(e) {
+    const files = e.target.files;
     
-    // Clear input value so selecting the same file again triggers change event
+    // CRITICAL: Reset input so selecting same file works again
     e.target.value = ''; 
+
+    if (!files || files.length === 0) return;
 
     for (let i = 0; i < files.length; i++) {
         const base64 = await fileToBase64(files[i]);
-        selectedImages.push(base64); // ✅ Appends to existing array
+        selectedImages.push(base64);
     }
     
     renderImagePreview(); // ✅ Use a dedicated render function
