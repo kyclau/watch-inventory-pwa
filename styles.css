@@ -104,6 +104,32 @@ body {
     cursor: pointer;
 }
 
+/* NEW: Filter Button Styles */
+.filter-btn {
+    background: #000000;
+    border: 1px solid #C1A981;
+    color: #C1A981;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.filter-btn:active { background: rgba(193, 169, 129, 0.2); }
+
+.clear-filters-btn {
+    background: #F21E4A;
+    border: 1px solid #F21E4A;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
