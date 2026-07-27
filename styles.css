@@ -325,11 +325,15 @@ body {
 }
 
 .image-preview {
-    display: flex;
+    display: flex !important; /* Force it to be visible */
     gap: 10px;
     margin-top: 10px;
     flex-wrap: wrap;
-    min-height: 20px; /* Prevent collapse when empty */
+    min-height: 20px;
+    width: 100%;
+    background: rgba(255,255,255,0.05); /* Temporary background to see it */
+    padding: 5px;
+    border-radius: 5px;
 }
 
 /* Optional: Visual cue when dragging */
