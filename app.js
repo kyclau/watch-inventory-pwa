@@ -747,13 +747,16 @@ function renderImagePreview() {
     }
 
     selectedImages.forEach((imgSrc, index) => {
+        // 1. Create Container
         const container = document.createElement('div');
         container.style.position = 'relative';
+        container.style.display = 'inline-block'; // Ensure it sits correctly
         container.style.marginRight = '10px';
         container.style.marginBottom = '10px';
         container.style.cursor = 'grab';
         container.dataset.index = index;
 
+        // 2. Create Image
         const img = document.createElement('img');
         img.src = imgSrc;
         img.style.width = '60px';
@@ -763,8 +766,10 @@ function renderImagePreview() {
         img.style.border = '2px solid #C1A981';
         img.style.pointerEvents = 'none'; 
         
+        // 3. Create Delete Button (Strictly as an Element)
         const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '×';
+        deleteBtn.type = 'button'; // Prevent form submission
+        deleteBtn.textContent = '×'; // Set text content safely
         deleteBtn.style.position = 'absolute';
         deleteBtn.style.top = '-5px';
         deleteBtn.style.right = '-5px';
@@ -780,22 +785,28 @@ function renderImagePreview() {
         deleteBtn.style.display = 'flex';
         deleteBtn.style.alignItems = 'center';
         deleteBtn.style.justifyContent = 'center';
+        deleteBtn.style.padding = '0';
         
+        // Attach Click Event
         deleteBtn.onclick = (e) => {
+            e.preventDefault();
             e.stopPropagation();
             selectedImages.splice(index, 1);
             renderImagePreview();
         };
 
+        // 4. Append Elements (CRITICAL STEP)
         container.appendChild(img);
-        container.appendChild(deleteBtn);
-        
+        container.appendChild(deleteBtn); // This must be appendChild, NOT innerHTML
+
+        // 5. Add Drag Events
         container.draggable = true;
         container.addEventListener('dragstart', handleDragStart);
         container.addEventListener('dragover', handleDragOver);
         container.addEventListener('drop', handleDrop);
         container.addEventListener('dragend', handleDragEnd);
 
+        // 6. Add to DOM
         imagePreview.appendChild(container);
     });
 }
