@@ -6,7 +6,7 @@ let currentImageIndex = 0;
 let currentImages = [];
 let editingWatchId = null;
 let currentWatchId = null;
-let sortField = 'savedDate';
+let sortField = 'brandModel'; 
 let sortOrder = 'asc';
 
 const DB_NAME = 'KLWatchCabinetDB';
@@ -325,6 +325,11 @@ async function init() {
         sortWatches();
         render();
         setupEventListeners();
+
+        const sortSelect = document.getElementById('sortField');
+        if (sortSelect) {
+            sortSelect.value = sortField; 
+        }
         
         console.log('App initialized successfully'); // Debug log
     } catch (error) {
