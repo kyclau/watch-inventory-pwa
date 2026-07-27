@@ -185,24 +185,22 @@ function sortWatches() {
         let result = 0;
         
         if (sortField === 'brandModel') {
-            // LEVEL 1: Sort by Brand
+            // LEVEL 1: Brand
             const brandA = (a.brand || '').toLowerCase();
             const brandB = (b.brand || '').toLowerCase();
             
             if (brandA < brandB) result = -1;
             else if (brandA > brandB) result = 1;
             else {
-                // LEVEL 2: If Brands are equal, sort by Model
+                // LEVEL 2: Model
                 const modelA = (a.modelName || '').toLowerCase();
                 const modelB = (b.modelName || '').toLowerCase();
-                
                 if (modelA < modelB) result = -1;
                 else if (modelA > modelB) result = 1;
                 else result = 0;
             }
         } 
         else if (sortField === 'finalPriceHKD') {
-            // Parse price string to number
             const parsePrice = (p) => {
                 if (!p) return 0;
                 return parseFloat(p.toString().replace(/[^0-9.-]+/g, "")) || 0;
@@ -215,8 +213,12 @@ function sortWatches() {
             else result = 0;
         } 
         else if (sortField === 'purchasedDate') {
-            valA = parseDate(a.purchasedDate);
-            valB = parseDate(b.purchasedDate);
+            // Convert both to timestamps (numbers) for reliable comparison
+            const dateA = parseDate(a.purchasedDate);
+            const dateB = parseDate(b.purchasedDate);
+            
+            valA = dateA.getTime(); 
+            valB = dateB.getTime();
             
             if (valA < valB) result = -1;
             else if (valA > valB) result = 1;
@@ -231,26 +233,42 @@ function sortWatches() {
             else result = 0;
         } 
         else {
-            // Fallback
-            valA = parseDate(a.savedDate);
-            valB = parseDate(b.savedDate);
+            // Fallback to savedDate
+            const dateA = parseDate(a.savedDate);
+            const dateB = parseDate(b.savedDate);
+            valA = dateA.getTime();
+            valB = dateB.getTime();
             if (valA < valB) result = -1;
             else if (valA > valB) result = 1;
             else result = 0;
         }
         
-        // Apply Ascending/Descending direction
+        // Apply Direction
         return sortOrder === 'asc' ? result : -result;
     });
 }
 
 function parseDate(dateStr) {
-    if (!dateStr) return new Date(0);
-    const parts = dateStr.split('/');
-    if (parts.length === 3) {
-        return new Date(parts[2], parts[0] - 1, parts[1]);
+    if (!dateStr) return new Date(0); // Returns Jan 1, 1970 for empty dates
+    
+    // Handle YYYY-MM-DD (from <input type="date">)
+    if (dateStr.includes('-')) {
+        const parts = dateStr.split('-');
+        // Ensure we treat it as local time, not UTC, to avoid timezone shifts
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
     }
-    return new Date(0);
+    
+    // Handle MM/DD/YYYY (legacy format)
+    if (dateStr.includes('/')) {
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+            return new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+        }
+    }
+    
+    // Fallback: Try native parsing (less reliable but safe fallback)
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date(0) : d;
 }
 
 // DOM Elements
