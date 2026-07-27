@@ -26,18 +26,20 @@
         </div>
 
         <div class="sort-controls">
-            <label>Sort by:</label>
+            <label>Sort:</label>
             <select id="sortField">
                 <option value="brandModel">Brand + Model</option>
                 <option value="finalPriceHKD">Final Price</option>
                 <option value="purchasedDate">Purchased Date</option>
                 <option value="year">Release Year</option>
             </select>
+            <button class="sort-order-btn" id="sortOrderBtn" title="Toggle Sort Order">↑</button>
             
-            <!-- Button contains ONLY the arrow icon. No text. -->
-            <button class="sort-order-btn" id="sortOrderBtn" title="Toggle Sort Order">
-                ↑
-            </button>
+            <div style="width:1px; height:20px; background:rgba(255,255,255,0.2); margin:0 8px;"></div>
+            
+            <label>Filter:</label>
+            <button class="filter-btn" id="openFilterBtn" title="Open Filters">🔍</button>
+            <button class="clear-filters-btn" id="clearFiltersBtn" title="Clear All Filters" style="display:none;">✕</button>
         </div>
 
         <div class="grid" id="watchGrid"></div>
@@ -45,6 +47,12 @@
         <div class="empty-state" id="emptyState">
             <p>No watches yet</p>
             <button class="btn-primary" id="emptyAddBtn">Add Your First Watch</button>
+        </div>
+
+        <!-- NEW: No Results State for Filters -->
+        <div class="empty-state" id="noResultsState" style="display:none;">
+            <p>No watches match your filters.</p>
+            <button class="btn-primary" id="clearFiltersFromEmpty">Clear Filters</button>
         </div>
     </div>
 
@@ -270,6 +278,52 @@
 
     <script src="app.js"></script>
 
+    <!-- NEW: Filter Modal -->
+    <div class="modal" id="filterModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Filter Watches</h2>
+                <button class="close-btn" id="closeFilterBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select id="filterBrand"><option value="">All</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Battery</label>
+                        <select id="filterBattery"><option value="">All</option></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Module</label>
+                        <select id="filterModule"><option value="">All</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Material</label>
+                        <select id="filterMaterial"><option value="">All</option></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Movement</label>
+                        <select id="filterMovement"><option value="">All</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select id="filterLocation"><option value="">All</option></select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="resetFiltersBtn">Reset</button>
+                <button type="button" class="btn-save" id="applyFiltersBtn">Apply</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- SYNC MODAL (BEFORE </body>) -->
     <div class="modal" id="syncModal">
         <div class="modal-content">
