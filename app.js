@@ -411,6 +411,7 @@ const imagePreview = document.getElementById('imagePreview');
 const imagesInput = document.getElementById('images');
 const sortFieldSelect = document.getElementById('sortField');
 const sortOrderBtn = document.getElementById('sortOrderBtn');
+const filterModal = document.getElementById('filterModal');
 
 // Initialize App
 async function init() {
@@ -710,13 +711,13 @@ let selectedImages = [];
 async function handleImageSelect(e) {
     const files = e.target.files;
     
-    // Reset input
+    // CRITICAL: Reset input so selecting the same file works again
     e.target.value = ''; 
 
     if (!files || files.length === 0) return;
 
-    // ✅ VISUAL CONFIRMATION: If you see this alert, the code IS running
-    alert(`Adding ${files.length} new image(s)... Total will be: ${selectedImages.length + files.length}`);
+    // Optional: Alert to confirm it's running (you can remove this later)
+    // alert(`Adding ${files.length} new image(s)...`);
 
     for (let i = 0; i < files.length; i++) {
         try {
@@ -729,11 +730,9 @@ async function handleImageSelect(e) {
         }
     }
     
-    // Force a tiny delay to ensure DOM is ready
-    setTimeout(() => {
-        renderImagePreview();
-        console.log('Preview rendered. Count:', selectedImages.length);
-    }, 100);
+    // Render immediately
+    renderImagePreview();
+    console.log('Images updated. Total count:', selectedImages.length);
 }
 
 // ✅ NEW: Helper to render the preview with delete/reorder buttons
