@@ -708,6 +708,20 @@ let selectedImages = [];
 
 async function handleImageSelect(e) {
     const files = e.target.files;
+
+        // ✅ CRITICAL: Reset the input value immediately so selecting the same file triggers change again
+    e.target.value = ''; 
+
+    if (!files || files.length === 0) return;
+
+    // Process new files
+    for (let i = 0; i < files.length; i++) {
+        const base64 = await fileToBase64(files[i]);
+        selectedImages.push(base64);
+    }
+    
+    renderImagePreview();
+}
     // ✅ Do NOT clear selectedImages here if editing an existing watch with images
     // We only clear if it's a brand new watch (handled in openAddModal)
     
@@ -819,8 +833,15 @@ function openAddModal() {
     editingWatchId = null;
     document.getElementById('modalTitle').textContent = 'Add Watch';
     watchForm.reset();
+    
+    // ✅ Explicitly clear state for new watch
     selectedImages = [];
-    imagePreview.innerHTML = '';
+    if (imagePreview) imagePreview.innerHTML = '';
+    
+    // ✅ Reset file input specifically
+    const imagesInput = document.getElementById('images');
+    if (imagesInput) imagesInput.value = '';
+    
     watchModal.classList.add('active');
 }
 
@@ -1137,7 +1158,12 @@ function editCurrentWatch() {
 
     // ✅ Load existing images if they exist
     selectedImages = watch.images || [];
-    renderImagePreview(); // ✅ Render them immediately
+    renderImagePreview();
+    
+    // ✅ Reset file input so user can re-select files if needed
+    const imagesInput = document.getElementById('images');
+    if (imagesInput) imagesInput.value = '';
+    
     watchModal.classList.add('active');
 }
 
