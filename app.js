@@ -8,6 +8,14 @@ let editingWatchId = null;
 let currentWatchId = null;
 let sortField = 'brandModel'; 
 let sortOrder = 'asc';
+let activeFilters = {
+    brand: '',
+    battery: '',
+    module: '',
+    material: '',
+    movement: '',
+    location: ''
+};
 
 const DB_NAME = 'KLWatchCabinetDB';
 const DB_VERSION = 1;
@@ -271,11 +279,129 @@ function parseDate(dateStr) {
     return isNaN(d.getTime()) ? new Date(0) : d;
 }
 
+// --- NEW: POPULATE FILTER DROPDOWNS ---
+function populateFilterDropdowns() {
+    const fields = [
+        { key: 'brand', id: 'filterBrand' },
+        { key: 'battery', id: 'filterBattery' },
+        { key: 'moduleNumber', id: 'filterModule' },
+        { key: 'caseMaterial', id: 'filterMaterial' },
+        { key: 'movement', id: 'filterMovement' },
+        { key: 'location', id: 'filterLocation' }
+    ];
+
+    fields.forEach(field => {
+        const select = document.getElementById(field.id);
+        if (!select) return;
+        
+        const values = new Set();
+        watches.forEach(w => {
+            const val = w[field.key];
+            if (val && val.trim() !== '') {
+                values.add(val.trim());
+            }
+        });
+
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">All</option>';
+        Array.from(values).sort().forEach(val => {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = val;
+            select.appendChild(opt);
+        });
+
+        if (Array.from(values).includes(currentVal)) {
+            select.value = currentVal;
+        } else {
+            select.value = '';
+            activeFilters[field.key === 'moduleNumber' ? 'module' : field.key] = '';
+        }
+    });
+}
+
+// --- NEW: APPLY FILTERS ---
+function applyFilters() {
+    let filtered = watches.filter(w => {
+        if (activeFilters.brand && w.brand !== activeFilters.brand) return false;
+        if (activeFilters.battery && w.battery !== activeFilters.battery) return false;
+        if (activeFilters.module && w.moduleNumber !== activeFilters.module) return false;
+        if (activeFilters.material && w.caseMaterial !== activeFilters.material) return false;
+        if (activeFilters.movement && w.movement !== activeFilters.movement) return false;
+        if (activeFilters.location && w.location !== activeFilters.location) return false;
+        return true;
+    });
+    return filtered;
+}
+
+// --- MODIFIED: SORT WATCHES (Now accepts a list) ---
+function sortWatches(listToSort) {
+    const list = [...listToSort];
+    list.sort((a, b) => {
+        let valA, valB;
+        let result = 0;
+        
+        if (sortField === 'brandModel') {
+            const brandA = (a.brand || '').toLowerCase();
+            const brandB = (b.brand || '').toLowerCase();
+            if (brandA < brandB) result = -1;
+            else if (brandA > brandB) result = 1;
+            else {
+                const modelA = (a.modelName || '').toLowerCase();
+                const modelB = (b.modelName || '').toLowerCase();
+                if (modelA < modelB) result = -1;
+                else if (modelA > modelB) result = 1;
+                else result = 0;
+            }
+        } 
+        else if (sortField === 'finalPriceHKD') {
+            const parsePrice = (p) => {
+                if (!p) return 0;
+                return parseFloat(p.toString().replace(/[^0-9.-]+/g, "")) || 0;
+            };
+            valA = parsePrice(a.finalPriceHKD);
+            valB = parsePrice(b.finalPriceHKD);
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
+        } 
+        else if (sortField === 'purchasedDate') {
+            const dateA = parseDate(a.purchasedDate);
+            const dateB = parseDate(b.purchasedDate);
+            valA = dateA.getTime(); 
+            valB = dateB.getTime();
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
+        } 
+        else if (sortField === 'year') {
+            valA = parseInt(a.year) || 0;
+            valB = parseInt(b.year) || 0;
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
+        } 
+        else {
+            const dateA = parseDate(a.savedDate);
+            const dateB = parseDate(b.savedDate);
+            valA = dateA.getTime();
+            valB = dateB.getTime();
+            if (valA < valB) result = -1;
+            else if (valA > valB) result = 1;
+            else result = 0;
+        }
+        return sortOrder === 'asc' ? result : -result;
+    });
+    return list;
+}
+
 // DOM Elements
 const watchGrid = document.getElementById('watchGrid');
 const emptyState = document.getElementById('emptyState');
 const statsBar = document.getElementById('statsBar');
 const watchCount = document.getElementById('watchCount');
+const filterActiveCount = document.getElementById('filterActiveCount');
+const noResultsState = document.getElementById('noResultsState');
 const addWatchBtn = document.getElementById('addWatchBtn');
 const emptyAddBtn = document.getElementById('emptyAddBtn');
 const watchModal = document.getElementById('watchModal');
@@ -322,8 +448,7 @@ async function init() {
         }
         // ---------------------------------------------
 
-        sortWatches();
-        render();
+        refreshView(); 
         setupEventListeners();
 
         const sortSelect = document.getElementById('sortField');
@@ -338,27 +463,57 @@ async function init() {
     }
 }
 
-// Render watch grid
+// NEW: Unified Refresh Function
+function refreshView() {
+    populateFilterDropdowns();
+    const filteredList = applyFilters();
+    sortedWatches = sortWatches(filteredList);
+    render();
+    updateFilterUI();
+}
+
+// NEW: Update Filter UI State
+function updateFilterUI() {
+    const hasFilters = Object.values(activeFilters).some(v => v !== '');
+    const clearBtn = document.getElementById('clearFiltersBtn');
+    if (clearBtn) clearBtn.style.display = hasFilters ? 'block' : 'none';
+}
+
+// MODIFIED: Render Function
 function render() {
     if (sortedWatches.length === 0) {
         watchGrid.style.display = 'none';
-        emptyState.style.display = 'block';
         statsBar.style.display = 'none';
+        
+        if (watches.length === 0) {
+            emptyState.style.display = 'block';
+            noResultsState.style.display = 'none';
+        } else {
+            emptyState.style.display = 'none';
+            noResultsState.style.display = 'block';
+        }
     } else {
         watchGrid.style.display = 'grid';
         emptyState.style.display = 'none';
+        noResultsState.style.display = 'none';
         statsBar.style.display = 'block';
-        watchCount.textContent = sortedWatches.length + ' watch' + (sortedWatches.length !== 1 ? 'es' : '');
+        
+        const total = watches.length;
+        const shown = sortedWatches.length;
+        watchCount.textContent = shown + ' watch' + (shown !== 1 ? 'es' : '');
+        
+        if (shown < total) {
+            filterActiveCount.style.display = 'inline';
+            filterActiveCount.textContent = `(of ${total})`;
+        } else {
+            filterActiveCount.style.display = 'none';
+        }
     }
 
     watchGrid.innerHTML = sortedWatches.map(watch => {
-        const imgUrl = watch.images && watch.images.length > 0 
-            ? watch.images[0] 
-            : 'https://placehold.co/400x300?text=No+Image';
+        const imgUrl = watch.images && watch.images.length > 0 ? watch.images[0] : 'https://placehold.co/400x300?text=No+Image';
         const brand = watch.brand || 'Unknown';
         const model = watch.modelName || 'Unknown';
-        // Price variable removed as it is no longer displayed
-        
         return `
             <div class="card" data-id="${watch.id}">
                 <img src="${imgUrl}" alt="${brand} ${model}">
@@ -395,24 +550,69 @@ function setupEventListeners() {
 
     sortFieldSelect.addEventListener('change', function() {
         sortField = this.value;
-        sortWatches();
-        render();
+        refreshView();
     });
 
-sortOrderBtn.addEventListener('click', function() {
-    // Toggle order
-    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-    
-    // Update button to show ONLY the arrow icon
-    if (sortOrder === 'asc') {
-        this.textContent = '↑'; // Up arrow for Ascending
-    } else {
-        this.textContent = '↓'; // Down arrow for Descending
+    sortOrderBtn.addEventListener('click', function() {
+        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+        this.textContent = sortOrder === 'asc' ? '↑' : '↓';
+        refreshView();
+    });
+
+    // NEW: Filter Modal Events (Add this block immediately after the Sort listeners)
+    const openFilterBtn = document.getElementById('openFilterBtn');
+    const closeFilterBtn = document.getElementById('closeFilterBtn');
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    const clearFiltersFromEmpty = document.getElementById('clearFiltersFromEmpty');
+
+    if (clearFiltersFromEmpty) clearFiltersFromEmpty.addEventListener('click', resetFilters);
+
+    if (openFilterBtn) {
+        openFilterBtn.addEventListener('click', () => {
+            document.getElementById('filterBrand').value = activeFilters.brand || '';
+            document.getElementById('filterBattery').value = activeFilters.battery || '';
+            document.getElementById('filterModule').value = activeFilters.module || '';
+            document.getElementById('filterMaterial').value = activeFilters.material || '';
+            document.getElementById('filterMovement').value = activeFilters.movement || '';
+            document.getElementById('filterLocation').value = activeFilters.location || '';
+            filterModal.classList.add('active');
+        });
     }
-    
-    sortWatches();
-    render();
-});
+    if (closeFilterBtn) {
+        closeFilterBtn.addEventListener('click', () => filterModal.classList.remove('active'));
+    }
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', () => {
+            activeFilters.brand = document.getElementById('filterBrand').value;
+            activeFilters.battery = document.getElementById('filterBattery').value;
+            activeFilters.module = document.getElementById('filterModule').value;
+            activeFilters.material = document.getElementById('filterMaterial').value;
+            activeFilters.movement = document.getElementById('filterMovement').value;
+            activeFilters.location = document.getElementById('filterLocation').value;
+            filterModal.classList.remove('active');
+            refreshView();
+        });
+    }
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', resetFilters);
+    }
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', resetFilters);
+    }
+    if (filterModal) {
+        filterModal.addEventListener('click', (e) => {
+            if (e.target === filterModal) filterModal.classList.remove('active');
+        });
+    }
+
+    // NEW: Reset Filters Function (Add this helper function inside setupEventListeners or globally)
+    function resetFilters() {
+        activeFilters = { brand: '', battery: '', module: '', material: '', movement: '', location: '' };
+        filterModal.classList.remove('active');
+        refreshView();
+    }
 
     // Brand other input toggle
     document.getElementById('brand').addEventListener('change', function() {
