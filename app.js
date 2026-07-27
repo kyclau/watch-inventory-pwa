@@ -835,6 +835,13 @@ function openAddModal() {
     if (imagesInput) imagesInput.value = '';
     
     watchModal.classList.add('active');
+
+    // ✅ FORCE RE-ATTACH LISTENER
+    const newInput = document.getElementById('images');
+    if (newInput) {
+        newInput.removeEventListener('change', handleImageSelect); // Remove old
+        newInput.addEventListener('change', handleImageSelect);    // Add fresh
+    }
 }
 
 // Close Add Modal
@@ -1157,6 +1164,13 @@ function editCurrentWatch() {
     if (imagesInput) imagesInput.value = '';
     
     watchModal.classList.add('active');
+
+    // ✅ FORCE RE-ATTACH LISTENER
+    const newInput = document.getElementById('images');
+    if (newInput) {
+        newInput.removeEventListener('change', handleImageSelect); 
+        newInput.addEventListener('change', handleImageSelect);    
+    }
 }
 
 // Delete current watch
