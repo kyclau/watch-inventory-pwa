@@ -28,11 +28,15 @@
         <div class="sort-controls">
             <label>Sort by:</label>
             <select id="sortField">
-                <option value="savedDate">Saved Date</option>
-                <option value="brand">Brand</option>
-                <option value="year">Year</option>
+                <option value="brandModel">Brand + Model</option>
+                <option value="finalPriceHKD">Final Price</option>
+                <option value="purchasedDate">Purchased Date</option>
+                <option value="year">Release Year</option>
             </select>
-            <button class="sort-order-btn" id="sortOrderBtn">Ascending ↑</button>
+            <!-- Button now only contains icons -->
+            <button class="sort-order-btn" id="sortOrderBtn" title="Toggle Sort Order">
+                ⇅
+            </button>
         </div>
 
         <div class="grid" id="watchGrid"></div>
