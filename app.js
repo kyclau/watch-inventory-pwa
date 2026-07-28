@@ -627,6 +627,12 @@ function setupEventListeners() {
         }
     });
 
+    // ✅ ADD THIS BLOCK HERE (Move it from openAddModal)
+    const imagesInput = document.getElementById('images');
+    if (imagesInput) {
+        imagesInput.addEventListener('change', handleImageSelect);
+    }
+    
     // Currency other input toggle
     document.getElementById('currency').addEventListener('change', function() {
         document.getElementById('currencyOther').classList.toggle('hidden', this.value !== 'other');
@@ -708,19 +714,17 @@ let selectedImages = [];
 
 // ✅ FIXED: Single, clean function
 async function handleImageSelect(e) {
-    // When called from HTML onchange, 'e' is the event object
     const files = e.target.files;
     
     console.log('📸 FILE SELECTED! Files found:', files ? files.length : 0);
 
     if (!files || files.length === 0) {
-        console.log('⚠️ No files in event.');
+        // This log will now only appear if you genuinely cancel the file picker
+        console.log('⚠️ No files in event (User cancelled or input empty).');
         return;
     }
 
-    // Reset input immediately so the same file can be selected again later
-    e.target.value = ''; 
-
+    // Process files
     console.log(`✅ Processing ${files.length} new file(s)...`);
 
     for (let i = 0; i < files.length; i++) {
@@ -733,9 +737,12 @@ async function handleImageSelect(e) {
         }
     }
     
-    // Render
+    // Render Preview
     renderImagePreview();
     console.log('🎨 Preview rendered.');
+
+    // ✅ Reset input value so the same file can be selected again if deleted and re-added
+    e.target.value = ''; 
 }
 
 // ✅ NEW: Helper to render the preview with delete/reorder buttons
@@ -863,11 +870,11 @@ function openAddModal() {
     watchModal.classList.add('active');
 
     // ✅ FORCE RE-ATTACH LISTENER
-    const newInput = document.getElementById('images');
-    if (newInput) {
-        newInput.removeEventListener('change', handleImageSelect); // Remove old
-        newInput.addEventListener('change', handleImageSelect);    // Add fresh
-    }
+    // const newInput = document.getElementById('images');
+    // if (newInput) {
+    //     newInput.removeEventListener('change', handleImageSelect); // Remove old
+    //     newInput.addEventListener('change', handleImageSelect);    // Add fresh
+    // }
 }
 
 // Close Add Modal
@@ -1196,11 +1203,11 @@ function editCurrentWatch() {
     watchModal.classList.add('active');
 
     // ✅ FORCE RE-ATTACH LISTENER
-    const newInput = document.getElementById('images');
-    if (newInput) {
-        newInput.removeEventListener('change', handleImageSelect); 
-        newInput.addEventListener('change', handleImageSelect);    
-    }
+    // const newInput = document.getElementById('images');
+    // if (newInput) {
+    //     newInput.removeEventListener('change', handleImageSelect); 
+    //     newInput.addEventListener('change', handleImageSelect);    
+    // }
 }
 
 // Delete current watch
