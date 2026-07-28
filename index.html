@@ -274,33 +274,28 @@
     </div>
 
     <!-- NEW: Filter Modal -->
-    <!-- ✅ UPDATED FILTER MODAL WITH SEARCH -->
     <div class="modal" id="filterModal">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2>Filter & Search</h2>
                 <button class="close-btn" id="closeFilterModalBtn">✕</button>
             </div>
             <div class="modal-body">
-                
-                <!-- Search Bar -->
-                <div class="form-group" style="margin-bottom: 15px;">
+                <div class="form-group">
                     <label>🔍 Search Text</label>
-                    <input type="text" id="filterSearchText" placeholder="Brand, Model, Reference..." 
-                           style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px;">
+                    <input type="text" id="filterSearchText" placeholder="Brand, Model, Reference...">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Brand</label>
-                        <select id="filterBrand" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <select id="filterBrand">
                             <option value="">All Brands</option>
-                            <!-- Options will be populated by JS -->
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Condition</label>
-                        <select id="filterCondition" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <select id="filterCondition">
                             <option value="">All Conditions</option>
                             <option value="Brand New">Brand New</option>
                             <option value="NOS">NOS</option>
@@ -315,7 +310,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Movement</label>
-                        <select id="filterMovement" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <select id="filterMovement">
                             <option value="">All Movements</option>
                             <option value="Quartz">Quartz</option>
                             <option value="Solar">Solar</option>
@@ -324,7 +319,7 @@
                     </div>
                     <div class="form-group">
                         <label>Material</label>
-                        <select id="filterMaterial" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <select id="filterMaterial">
                             <option value="">All Materials</option>
                             <option value="Resin">Resin</option>
                             <option value="Stainless Steel">Stainless Steel</option>
@@ -337,21 +332,18 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Battery</label>
-                        <select id="filterBattery" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <select id="filterBattery">
                             <option value="">All Batteries</option>
-                            <!-- Options populated by JS -->
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Module</label>
-                        <select id="filterModule" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <select id="filterModule">
                             <option value="">All Modules</option>
-                            <!-- Options populated by JS -->
                         </select>
                     </div>
                 </div>
 
-                                <!-- ✅ ADDED MISSING LOCATION FILTER -->
                 <div class="form-row">
                     <div class="form-group" style="grid-column: span 2;">
                         <label>Location</label>
@@ -360,17 +352,16 @@
                         </select>
                     </div>
                 </div>
-                
-            </div>
+            </div> <!-- End modal-body -->
+            
             <div class="modal-actions">
-                <button type="button" class="btn-cancel" id="resetFiltersBtn" style="flex:1; margin-right:10px;">Reset</button>
-                <button type="button" class="btn-save" id="applyFiltersBtn" style="flex:1;">Apply Filters</button>
+                <button type="button" class="btn-cancel" id="resetFiltersBtn">Reset</button>
+                <button type="button" class="btn-save" id="applyFiltersBtn">Apply Filters</button>
             </div>
-        </div>
-    </div>
-    <!-- ✅ END FILTER MODAL -->
+        </div> <!-- End modal-content -->
+    </div> <!-- End filterModal (THIS WAS MISSING) -->
 
-    <!-- Sync Modal (Keep this as is, just ensure tags are fixed) -->
+    <!-- SYNC MODAL -->
     <div class="modal" id="syncModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -380,14 +371,14 @@
             <div class="modal-body">
                 <p>Transfer watches between Chrome Extension and PWA</p>
                 
-                <button class="btn-primary" id="exportPWADataBtn" style="width:100%; margin-bottom:15px;">📥 Export to JSON</button>
+                <button class="btn-primary" id="exportPWADataBtn">📥 Export to JSON</button>
                 
-                <div style="margin-top:15px;">
-                    <label style="display:block; margin-bottom:5px;">📤 Import from JSON</label>
-                    <input type="file" id="importPWAFile" accept=".json" style="width:100%;">
+                <div>
+                    <label>📤 Import from JSON</label>
+                    <input type="file" id="importPWAFile" accept=".json">
                 </div>
                 
-                <div style="margin-top:20px; font-size:12px; color:#666; background:#f9f9f9; padding:10px; border-radius:5px;">
+                <div>
                     <strong>How to sync:</strong><br>
                     1. Export from Chrome Extension<br>
                     2. Send JSON to iPhone (AirDrop, email, etc.)<br>
@@ -397,7 +388,7 @@
         </div>
     </div>
 
-    <!-- Script MUST be the last thing before </body> -->
+    <!-- SCRIPT (Must be at the very end) -->
     <script src="app.js"></script>
 </body>
 </html>
