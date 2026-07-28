@@ -559,7 +559,7 @@ function setupEventListeners() {
         refreshView();
     });
 
-    // NEW: Filter Modal Events (Add this block immediately after the Sort listeners)
+    // NEW: Filter Modal Events
     const openFilterBtn = document.getElementById('openFilterBtn');
     const closeFilterBtn = document.getElementById('closeFilterBtn');
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
@@ -567,18 +567,53 @@ function setupEventListeners() {
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const clearFiltersFromEmpty = document.getElementById('clearFiltersFromEmpty');
 
-    if (clearFiltersFromEmpty) clearFiltersFromEmpty.addEventListener('click', resetFilters);
+    // ✅ FIX: Only run this if filterModal actually exists in HTML
+    if (filterModal) { 
+        if (clearFiltersFromEmpty) clearFiltersFromEmpty.addEventListener('click', resetFilters);
 
-    if (openFilterBtn) {
-        openFilterBtn.addEventListener('click', () => {
-            document.getElementById('filterBrand').value = activeFilters.brand || '';
-            document.getElementById('filterBattery').value = activeFilters.battery || '';
-            document.getElementById('filterModule').value = activeFilters.module || '';
-            document.getElementById('filterMaterial').value = activeFilters.material || '';
-            document.getElementById('filterMovement').value = activeFilters.movement || '';
-            document.getElementById('filterLocation').value = activeFilters.location || '';
-            filterModal.classList.add('active');
+        if (openFilterBtn) {
+            openFilterBtn.addEventListener('click', () => {
+                document.getElementById('filterBrand').value = activeFilters.brand || '';
+                document.getElementById('filterBattery').value = activeFilters.battery || '';
+                document.getElementById('filterModule').value = activeFilters.module || '';
+                document.getElementById('filterMaterial').value = activeFilters.material || '';
+                document.getElementById('filterMovement').value = activeFilters.movement || '';
+                document.getElementById('filterLocation').value = activeFilters.location || '';
+                filterModal.classList.add('active');
+            });
+        }
+        if (closeFilterBtn) {
+            closeFilterBtn.addEventListener('click', () => filterModal.classList.remove('active'));
+        }
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', () => {
+                activeFilters.brand = document.getElementById('filterBrand').value;
+                activeFilters.battery = document.getElementById('filterBattery').value;
+                activeFilters.module = document.getElementById('filterModule').value;
+                activeFilters.material = document.getElementById('filterMaterial').value;
+                activeFilters.movement = document.getElementById('filterMovement').value;
+                activeFilters.location = document.getElementById('filterLocation').value;
+                filterModal.classList.remove('active');
+                refreshView();
+            });
+        }
+        if (resetFiltersBtn) {
+            resetFiltersBtn.addEventListener('click', resetFilters);
+        }
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', resetFilters);
+        }
+        
+        filterModal.addEventListener('click', (e) => {
+            if (e.target === filterModal) filterModal.classList.remove('active');
         });
+    }
+
+    // Helper function (keep this outside or inside, but ensure it checks filterModal too)
+    function resetFilters() {
+        activeFilters = { brand: '', battery: '', module: '', material: '', movement: '', location: '' };
+        if (filterModal) filterModal.classList.remove('active');
+        refreshView();
     }
     if (closeFilterBtn) {
         closeFilterBtn.addEventListener('click', () => filterModal.classList.remove('active'));
@@ -627,10 +662,13 @@ function setupEventListeners() {
         }
     });
 
-    // ✅ ADD THIS BLOCK HERE (Move it from openAddModal)
+    // ✅ FIX: Ensure listener is only attached once
     const imagesInput = document.getElementById('images');
     if (imagesInput) {
-        imagesInput.addEventListener('change', handleImageSelect);
+        // Remove any existing listener first to prevent duplicates
+        imagesInput.replaceWith(imagesInput.cloneNode(true));
+        const newInput = document.getElementById('images');
+        newInput.addEventListener('change', handleImageSelect);
     }
     
     // Currency other input toggle
@@ -868,13 +906,6 @@ function openAddModal() {
     if (imagesInput) imagesInput.value = '';
     
     watchModal.classList.add('active');
-
-    // ✅ FORCE RE-ATTACH LISTENER
-    // const newInput = document.getElementById('images');
-    // if (newInput) {
-    //     newInput.removeEventListener('change', handleImageSelect); // Remove old
-    //     newInput.addEventListener('change', handleImageSelect);    // Add fresh
-    // }
 }
 
 // Close Add Modal
@@ -1201,13 +1232,6 @@ function editCurrentWatch() {
     if (imagesInput) imagesInput.value = '';
     
     watchModal.classList.add('active');
-
-    // ✅ FORCE RE-ATTACH LISTENER
-    // const newInput = document.getElementById('images');
-    // if (newInput) {
-    //     newInput.removeEventListener('change', handleImageSelect); 
-    //     newInput.addEventListener('change', handleImageSelect);    
-    // }
 }
 
 // Delete current watch
