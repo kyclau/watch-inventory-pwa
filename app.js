@@ -566,6 +566,7 @@ function setupEventListeners() {
     const resetFiltersBtn = document.getElementById('resetFiltersBtn');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const clearFiltersFromEmpty = document.getElementById('clearFiltersFromEmpty');
+    const filterModal = document.getElementById('filterModal'); 
 
     if (clearFiltersFromEmpty) clearFiltersFromEmpty.addEventListener('click', resetFilters);
 
