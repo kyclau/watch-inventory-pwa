@@ -9,9 +9,7 @@ let currentWatchId = null;
 let sortField = 'brandModel'; 
 let sortOrder = 'asc';
 let activeFilters = {
-    searchText: '',
     brand: '',
-    condition: '',
     battery: '',
     module: '',
     material: '',
@@ -285,7 +283,6 @@ function parseDate(dateStr) {
 function populateFilterDropdowns() {
     const fields = [
         { key: 'brand', id: 'filterBrand' },
-        { key: 'condition', id: 'filterCondition' }, // Added Condition
         { key: 'battery', id: 'filterBattery' },
         { key: 'moduleNumber', id: 'filterModule' },
         { key: 'caseMaterial', id: 'filterMaterial' },
@@ -325,26 +322,13 @@ function populateFilterDropdowns() {
 
 // --- NEW: APPLY FILTERS ---
 function applyFilters() {
-    const searchVal = (activeFilters.searchText || '').toLowerCase();
-    
     let filtered = watches.filter(w => {
-        // 1. Search Text (Checks Brand, Model, Module)
-        if (searchVal) {
-            const brandMatch = (w.brand || '').toLowerCase().includes(searchVal);
-            const modelMatch = (w.modelName || '').toLowerCase().includes(searchVal);
-            const moduleMatch = (w.moduleNumber || '').toLowerCase().includes(searchVal);
-            if (!brandMatch && !modelMatch && !moduleMatch) return false;
-        }
-
-        // 2. Exact Matches
         if (activeFilters.brand && w.brand !== activeFilters.brand) return false;
-        if (activeFilters.condition && w.condition !== activeFilters.condition) return false;
         if (activeFilters.battery && w.battery !== activeFilters.battery) return false;
         if (activeFilters.module && w.moduleNumber !== activeFilters.module) return false;
         if (activeFilters.material && w.caseMaterial !== activeFilters.material) return false;
         if (activeFilters.movement && w.movement !== activeFilters.movement) return false;
         if (activeFilters.location && w.location !== activeFilters.location) return false;
-        
         return true;
     });
     return filtered;
@@ -427,7 +411,6 @@ const imagePreview = document.getElementById('imagePreview');
 const imagesInput = document.getElementById('images');
 const sortFieldSelect = document.getElementById('sortField');
 const sortOrderBtn = document.getElementById('sortOrderBtn');
-const filterModal = document.getElementById('filterModal');
 
 // Initialize App
 async function init() {
@@ -563,6 +546,7 @@ function setupEventListeners() {
     document.getElementById('galleryNext').addEventListener('click', nextImage);
 
     watchForm.addEventListener('submit', handleFormSubmit);
+    imagesInput.addEventListener('change', handleImageSelect);
 
     sortFieldSelect.addEventListener('change', function() {
         sortField = this.value;
@@ -575,96 +559,62 @@ function setupEventListeners() {
         refreshView();
     });
 
-    // --- FILTER MODAL LISTENERS (FIXED: Removed Duplicates) ---
+    // NEW: Filter Modal Events (Add this block immediately after the Sort listeners)
     const openFilterBtn = document.getElementById('openFilterBtn');
-    const closeFilterBtn = document.getElementById('closeFilterModalBtn'); // Updated ID to match HTML
+    const closeFilterBtn = document.getElementById('closeFilterBtn');
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     const resetFiltersBtn = document.getElementById('resetFiltersBtn');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const clearFiltersFromEmpty = document.getElementById('clearFiltersFromEmpty');
 
-    // Helper function defined here so it's accessible
-    function resetFilters() {
-        activeFilters = { 
-            searchText: '', 
-            brand: '', 
-            condition: '', 
-            battery: '', 
-            module: '', 
-            material: '', 
-            movement: '', 
-            location: '' 
-        };
-        if (filterModal) filterModal.classList.remove('active');
-        refreshView();
+    if (clearFiltersFromEmpty) clearFiltersFromEmpty.addEventListener('click', resetFilters);
+
+    if (openFilterBtn) {
+        openFilterBtn.addEventListener('click', () => {
+            document.getElementById('filterBrand').value = activeFilters.brand || '';
+            document.getElementById('filterBattery').value = activeFilters.battery || '';
+            document.getElementById('filterModule').value = activeFilters.module || '';
+            document.getElementById('filterMaterial').value = activeFilters.material || '';
+            document.getElementById('filterMovement').value = activeFilters.movement || '';
+            document.getElementById('filterLocation').value = activeFilters.location || '';
+            filterModal.classList.add('active');
+        });
     }
-
-    // Only attach if the modal exists in HTML
+    if (closeFilterBtn) {
+        closeFilterBtn.addEventListener('click', () => filterModal.classList.remove('active'));
+    }
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', () => {
+            activeFilters.brand = document.getElementById('filterBrand').value;
+            activeFilters.battery = document.getElementById('filterBattery').value;
+            activeFilters.module = document.getElementById('filterModule').value;
+            activeFilters.material = document.getElementById('filterMaterial').value;
+            activeFilters.movement = document.getElementById('filterMovement').value;
+            activeFilters.location = document.getElementById('filterLocation').value;
+            filterModal.classList.remove('active');
+            refreshView();
+        });
+    }
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', resetFilters);
+    }
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', resetFilters);
+    }
     if (filterModal) {
-        if (clearFiltersFromEmpty) clearFiltersFromEmpty.addEventListener('click', resetFilters);
-
-        if (openFilterBtn) {
-            openFilterBtn.addEventListener('click', () => {
-                // Set values from state
-                const searchTextEl = document.getElementById('filterSearchText');
-                if(searchTextEl) searchTextEl.value = activeFilters.searchText || '';
-                
-                document.getElementById('filterBrand').value = activeFilters.brand || '';
-                document.getElementById('filterCondition').value = activeFilters.condition || ''; // Added
-                document.getElementById('filterBattery').value = activeFilters.battery || '';
-                document.getElementById('filterModule').value = activeFilters.module || '';
-                document.getElementById('filterMaterial').value = activeFilters.material || '';
-                document.getElementById('filterMovement').value = activeFilters.movement || '';
-                document.getElementById('filterLocation').value = activeFilters.location || '';
-                
-                filterModal.classList.add('active');
-            });
-        }
-        if (closeFilterBtn) {
-            closeFilterBtn.addEventListener('click', () => filterModal.classList.remove('active'));
-        }
-        if (applyFiltersBtn) {
-            applyFiltersBtn.addEventListener('click', () => {
-                // Read values from inputs
-                const searchTextEl = document.getElementById('filterSearchText');
-                if(searchTextEl) activeFilters.searchText = searchTextEl.value;
-
-                activeFilters.brand = document.getElementById('filterBrand').value;
-                activeFilters.condition = document.getElementById('filterCondition').value; // Added
-                activeFilters.battery = document.getElementById('filterBattery').value;
-                activeFilters.module = document.getElementById('filterModule').value;
-                activeFilters.material = document.getElementById('filterMaterial').value;
-                activeFilters.movement = document.getElementById('filterMovement').value;
-                activeFilters.location = document.getElementById('filterLocation').value;
-                
-                filterModal.classList.remove('active');
-                refreshView();
-            });
-        }
-        if (resetFiltersBtn) {
-            resetFiltersBtn.addEventListener('click', resetFilters);
-        }
-        if (clearFiltersBtn) {
-            clearFiltersBtn.addEventListener('click', resetFilters);
-        }
-        
         filterModal.addEventListener('click', (e) => {
             if (e.target === filterModal) filterModal.classList.remove('active');
         });
     }
 
-    // --- IMAGE INPUT LISTENER (FIXED: Prevent Double Execution) ---
-    const imagesInput = document.getElementById('images');
-    if (imagesInput) {
-        // 1. Clone to remove old listeners
-        const newInput = imagesInput.cloneNode(true);
-        imagesInput.parentNode.replaceChild(newInput, imagesInput);
-        
-        // 2. Attach fresh listener
-        newInput.addEventListener('change', handleImageSelect);
+    // NEW: Reset Filters Function (Add this helper function inside setupEventListeners or globally)
+    function resetFilters() {
+        activeFilters = { brand: '', battery: '', module: '', material: '', movement: '', location: '' };
+        filterModal.classList.remove('active');
+        refreshView();
     }
 
-    // --- OTHER FORM LISTENERS ---
+    // Brand other input toggle
     document.getElementById('brand').addEventListener('change', function() {
         const otherInput = document.getElementById('brandOther');
         if (this.value === 'Others (Specify)') {
@@ -677,13 +627,17 @@ function setupEventListeners() {
         }
     });
 
+    // Currency other input toggle
     document.getElementById('currency').addEventListener('change', function() {
         document.getElementById('currencyOther').classList.toggle('hidden', this.value !== 'other');
-        calculateFinalPrice();
+        calculateFinalPrice(); // Trigger calculation on currency change
     });
 
+    // Trigger calculation on price input
     document.getElementById('price').addEventListener('input', calculateFinalPrice);
 
+    // Case Material other input toggle
+    // Case Material other input toggle
     document.getElementById('caseMaterial').addEventListener('change', function() {
         const otherInput = document.getElementById('caseMaterialOther');
         if (this.value === 'Other (Specify)') {
@@ -696,10 +650,12 @@ function setupEventListeners() {
         }
     });
 
+    // Battery other input toggle
     document.getElementById('battery').addEventListener('change', function() {
         document.getElementById('batteryOther').classList.toggle('hidden', this.value !== 'Other');
     });
 
+    // Movement other input toggle
     document.getElementById('movement').addEventListener('change', function() {
         const otherInput = document.getElementById('movementOther');
         if (this.value === 'Others (Specify)') {
@@ -711,7 +667,7 @@ function setupEventListeners() {
             otherInput.value = '';
         }
     });
-    
+
     // Close modal on outside click
     watchModal.addEventListener('click', (e) => {
         if (e.target === watchModal) closeAddModal();
@@ -750,65 +706,37 @@ function setupEventListeners() {
 // Image handling
 let selectedImages = [];
 
-// Global flag to prevent double processing
-let isProcessingImage = false;
-
 async function handleImageSelect(e) {
-    // Prevent double execution if event fires twice
-    if (isProcessingImage) {
-        console.log('⚠️ Already processing an image, ignoring duplicate event.');
-        return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Process new files
+    for (let i = 0; i < files.length; i++) {
+        const base64 = await fileToBase64(files[i]);
+        // Only add if not already in the list (prevents accidental double selection)
+        if (!selectedImages.includes(base64)) {
+            selectedImages.push(base64);
+        }
     }
     
-    const files = e.target.files;
-    console.log('📸 FILE SELECTED! Files found:', files ? files.length : 0);
-
-    if (!files || files.length === 0) {
-        console.log('⚠️ No files in event.');
-        return;
-    }
-
-    isProcessingImage = true; // LOCK
-    console.log(`✅ Processing ${files.length} new file(s)...`);
-
-    try {
-        for (let i = 0; i < files.length; i++) {
-            const base64 = await fileToBase64(files[i]);
-            selectedImages.push(base64);
-            console.log(`➕ Added image. Total: ${selectedImages.length}`);
-        }
-        
-        renderImagePreview();
-        console.log('🎨 Preview rendered.');
-    } catch (err) {
-        console.error('❌ Error converting file:', err);
-    } finally {
-        isProcessingImage = false; // UNLOCK
-        e.target.value = ''; // Reset input
-    }
+    // Re-render the full preview (Existing + New)
+    renderImagePreview();
+    
+    // Reset input so same file can be selected again if needed
+    e.target.value = ''; 
 }
 
-// ✅ NEW: Helper to render the preview with delete/reorder buttons
 function renderImagePreview() {
-    if (!imagePreview) return;
-    
     imagePreview.innerHTML = '';
     
-    if (selectedImages.length === 0) {
-        return; 
-    }
+    if (selectedImages.length === 0) return;
 
     selectedImages.forEach((imgSrc, index) => {
-        // 1. Create Container
         const container = document.createElement('div');
         container.style.position = 'relative';
-        container.style.display = 'inline-block'; // Ensure it sits correctly
-        container.style.marginRight = '10px';
-        container.style.marginBottom = '10px';
-        container.style.cursor = 'grab';
-        container.dataset.index = index;
+        container.style.display = 'inline-block';
+        container.style.margin = '5px';
 
-        // 2. Create Image
         const img = document.createElement('img');
         img.src = imgSrc;
         img.style.width = '60px';
@@ -816,15 +744,112 @@ function renderImagePreview() {
         img.style.objectFit = 'cover';
         img.style.borderRadius = '5px';
         img.style.border = '2px solid #C1A981';
-        img.style.pointerEvents = 'none'; 
+        img.style.cursor = 'pointer';
+        img.title = 'Click to move to front';
         
-        // 3. Create Delete Button (Strictly as an Element)
+        // REORDER LOGIC: Click to move to position 0
+        img.addEventListener('click', () => {
+            if (index === 0) return; 
+            // Remove from current spot
+            const movedItem = selectedImages.splice(index, 1)[0];
+            // Add to front
+            selectedImages.unshift(movedItem);
+            // Re-render
+            renderImagePreview();
+        });
+
+        // Number Badge
+        const badge = document.createElement('span');
+        badge.textContent = index + 1;
+        badge.style.position = 'absolute';
+        badge.style.top = '-5px';
+        badge.style.left = '-5px';
+        badge.style.background = '#C1A981';
+        badge.style.color = '#000';
+        badge.style.fontSize = '10px';
+        badge.style.fontWeight = 'bold';
+        badge.style.width = '18px';
+        badge.style.height = '18px';
+        badge.style.borderRadius = '50%';
+        badge.style.display = 'flex';
+        badge.style.alignItems = 'center';
+        badge.style.justifyContent = 'center';
+        badge.style.pointerEvents = 'none';
+
+        // Delete Button
         const deleteBtn = document.createElement('button');
-        deleteBtn.type = 'button'; // Prevent form submission
-        deleteBtn.textContent = '×'; // Set text content safely
+        deleteBtn.textContent = '×';
         deleteBtn.style.position = 'absolute';
         deleteBtn.style.top = '-5px';
         deleteBtn.style.right = '-5px';
+        deleteBtn.style.background = '#F21E4A';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '50%';
+        deleteBtn.style.width = '18px';
+        deleteBtn.style.height = '18px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.fontSize = '14px';
+        deleteBtn.style.lineHeight = '1';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent moving the image
+            if(confirm('Remove this image?')) {
+                selectedImages.splice(index, 1);
+                renderImagePreview();
+            }
+        });
+
+        container.appendChild(img);
+        container.appendChild(badge);
+        container.appendChild(deleteBtn);
+        imagePreview.appendChild(container);
+    });
+}
+
+// NEW HELPER FUNCTION: Render Preview with Reorder Logic
+function renderImagePreview() {
+    imagePreview.innerHTML = '';
+    
+    selectedImages.forEach((imgSrc, index) => {
+        const container = document.createElement('div');
+        container.style.position = 'relative';
+        container.style.display = 'inline-block';
+        
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.style.cursor = 'pointer';
+        img.title = 'Click to move to front';
+        
+        // Click to move this image to the first position
+        img.addEventListener('click', () => {
+            if (index === 0) return; // Already first
+            const moved = selectedImages.splice(index, 1)[0];
+            selectedImages.unshift(moved);
+            renderImagePreview();
+        });
+
+        // Add a small number badge
+        const badge = document.createElement('span');
+        badge.textContent = index + 1;
+        badge.style.position = 'absolute';
+        badge.style.top = '2px';
+        badge.style.left = '2px';
+        badge.style.background = 'rgba(0,0,0,0.7)';
+        badge.style.color = 'white';
+        badge.style.fontSize = '10px';
+        badge.style.padding = '2px 6px';
+        badge.style.borderRadius = '10px';
+        badge.style.pointerEvents = 'none';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '×';
+        deleteBtn.style.position = 'absolute';
+        deleteBtn.style.top = '2px';
+        deleteBtn.style.right = '2px';
         deleteBtn.style.background = '#F21E4A';
         deleteBtn.style.color = 'white';
         deleteBtn.style.border = 'none';
@@ -834,81 +859,30 @@ function renderImagePreview() {
         deleteBtn.style.cursor = 'pointer';
         deleteBtn.style.fontSize = '14px';
         deleteBtn.style.lineHeight = '1';
-        deleteBtn.style.display = 'flex';
-        deleteBtn.style.alignItems = 'center';
-        deleteBtn.style.justifyContent = 'center';
-        deleteBtn.style.padding = '0';
         
-        // Attach Click Event
-        deleteBtn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent triggering the move click
             selectedImages.splice(index, 1);
             renderImagePreview();
-        };
+        });
 
-        // 4. Append Elements (CRITICAL STEP)
         container.appendChild(img);
-        container.appendChild(deleteBtn); // This must be appendChild, NOT innerHTML
-
-        // 5. Add Drag Events
-        container.draggable = true;
-        container.addEventListener('dragstart', handleDragStart);
-        container.addEventListener('dragover', handleDragOver);
-        container.addEventListener('drop', handleDrop);
-        container.addEventListener('dragend', handleDragEnd);
-
-        // 6. Add to DOM
+        container.appendChild(badge);
+        container.appendChild(deleteBtn);
         imagePreview.appendChild(container);
     });
 }
 
-// ✅ NEW: Drag and Drop Logic Variables
-let dragSrcIndex = null;
-
-function handleDragStart(e) {
-    dragSrcIndex = this.dataset.index;
-    this.style.opacity = '0.4';
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', this.innerHTML);
-}
-
-function handleDragOver(e) {
-    if (e.preventDefault) e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    return false;
-}
-
-function handleDrop(e) {
-    if (e.stopPropagation) e.stopPropagation();
-    const dragTargetIndex = this.dataset.index;
-    if (dragSrcIndex !== dragTargetIndex) {
-        const temp = selectedImages[dragSrcIndex];
-        selectedImages[dragSrcIndex] = selectedImages[dragTargetIndex];
-        selectedImages[dragTargetIndex] = temp;
-        renderImagePreview();
-    }
-    return false;
-}
-
-function handleDragEnd() {
-    this.style.opacity = '1';
-    const items = document.querySelectorAll('#imagePreview div');
-    items.forEach(item => item.style.opacity = '1');
-}
 // Open Add Modal
 function openAddModal() {
     editingWatchId = null;
     document.getElementById('modalTitle').textContent = 'Add Watch';
     watchForm.reset();
+   // Load existing images into our working array
+    selectedImages = watch.images ? [...watch.images] : [];
     
-    // ✅ Explicitly clear state for new watch
-    selectedImages = [];
-    if (imagePreview) imagePreview.innerHTML = '';
-    
-    // ✅ Reset file input specifically
-    const imagesInput = document.getElementById('images');
-    if (imagesInput) imagesInput.value = '';
+    // Render them immediately so user sees them
+    renderImagePreview();
     
     watchModal.classList.add('active');
 }
@@ -977,11 +951,13 @@ async function handleFormSubmit(e) {
 
     if (editingWatchId) {
         watch.id = editingWatchId;
-        // ✅ Always use the current state of selectedImages (which now holds old + new)
-        // No need to check length === 0 anymore because we loaded them in editCurrentWatch
-        if (!watch.images || watch.images.length === 0) {
-             const existing = watches.find(w => w.id === editingWatchId);
-             if (existing) watch.images = existing.images;
+        // selectedImages ALREADY contains existing + new images because of step 3 & 1
+        // We just save the current state of selectedImages
+        if (selectedImages.length > 0) {
+            watch.images = selectedImages;
+        } else {
+            // If user deleted all images, save empty array
+            watch.images = [];
         }
     }
 
@@ -1224,18 +1200,8 @@ function editCurrentWatch() {
     document.getElementById('description').value = watch.description || '';
     document.getElementById('purchasedDate').value = watch.purchasedDate || '';
 
-    // ✅ CRITICAL: Load existing images from the database object
-    selectedImages = watch.images || [];
-    
-    console.log('Edit Mode: Loaded', selectedImages.length, 'existing images.');
-
-    // ✅ Render them immediately
-    renderImagePreview();
-    
-    // Reset file input
-    const imagesInput = document.getElementById('images');
-    if (imagesInput) imagesInput.value = '';
-    
+    selectedImages = [];
+    imagePreview.innerHTML = '';
     watchModal.classList.add('active');
 }
 
