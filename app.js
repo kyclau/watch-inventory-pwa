@@ -9,7 +9,9 @@ let currentWatchId = null;
 let sortField = 'brandModel'; 
 let sortOrder = 'asc';
 let activeFilters = {
+    searchText: '',
     brand: '',
+    condition: '',
     battery: '',
     module: '',
     material: '',
@@ -283,6 +285,7 @@ function parseDate(dateStr) {
 function populateFilterDropdowns() {
     const fields = [
         { key: 'brand', id: 'filterBrand' },
+        { key: 'condition', id: 'filterCondition' }, // Added Condition
         { key: 'battery', id: 'filterBattery' },
         { key: 'moduleNumber', id: 'filterModule' },
         { key: 'caseMaterial', id: 'filterMaterial' },
@@ -322,13 +325,26 @@ function populateFilterDropdowns() {
 
 // --- NEW: APPLY FILTERS ---
 function applyFilters() {
+    const searchVal = (activeFilters.searchText || '').toLowerCase();
+    
     let filtered = watches.filter(w => {
+        // 1. Search Text (Checks Brand, Model, Module)
+        if (searchVal) {
+            const brandMatch = (w.brand || '').toLowerCase().includes(searchVal);
+            const modelMatch = (w.modelName || '').toLowerCase().includes(searchVal);
+            const moduleMatch = (w.moduleNumber || '').toLowerCase().includes(searchVal);
+            if (!brandMatch && !modelMatch && !moduleMatch) return false;
+        }
+
+        // 2. Exact Matches
         if (activeFilters.brand && w.brand !== activeFilters.brand) return false;
+        if (activeFilters.condition && w.condition !== activeFilters.condition) return false;
         if (activeFilters.battery && w.battery !== activeFilters.battery) return false;
         if (activeFilters.module && w.moduleNumber !== activeFilters.module) return false;
         if (activeFilters.material && w.caseMaterial !== activeFilters.material) return false;
         if (activeFilters.movement && w.movement !== activeFilters.movement) return false;
         if (activeFilters.location && w.location !== activeFilters.location) return false;
+        
         return true;
     });
     return filtered;
@@ -561,7 +577,7 @@ function setupEventListeners() {
 
     // --- FILTER MODAL LISTENERS (FIXED: Removed Duplicates) ---
     const openFilterBtn = document.getElementById('openFilterBtn');
-    const closeFilterBtn = document.getElementById('closeFilterBtn');
+    const closeFilterBtn = document.getElementById('closeFilterModalBtn'); // Updated ID to match HTML
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     const resetFiltersBtn = document.getElementById('resetFiltersBtn');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
@@ -569,7 +585,16 @@ function setupEventListeners() {
 
     // Helper function defined here so it's accessible
     function resetFilters() {
-        activeFilters = { brand: '', battery: '', module: '', material: '', movement: '', location: '' };
+        activeFilters = { 
+            searchText: '', 
+            brand: '', 
+            condition: '', 
+            battery: '', 
+            module: '', 
+            material: '', 
+            movement: '', 
+            location: '' 
+        };
         if (filterModal) filterModal.classList.remove('active');
         refreshView();
     }
@@ -580,12 +605,18 @@ function setupEventListeners() {
 
         if (openFilterBtn) {
             openFilterBtn.addEventListener('click', () => {
+                // Set values from state
+                const searchTextEl = document.getElementById('filterSearchText');
+                if(searchTextEl) searchTextEl.value = activeFilters.searchText || '';
+                
                 document.getElementById('filterBrand').value = activeFilters.brand || '';
+                document.getElementById('filterCondition').value = activeFilters.condition || ''; // Added
                 document.getElementById('filterBattery').value = activeFilters.battery || '';
                 document.getElementById('filterModule').value = activeFilters.module || '';
                 document.getElementById('filterMaterial').value = activeFilters.material || '';
                 document.getElementById('filterMovement').value = activeFilters.movement || '';
                 document.getElementById('filterLocation').value = activeFilters.location || '';
+                
                 filterModal.classList.add('active');
             });
         }
@@ -594,12 +625,18 @@ function setupEventListeners() {
         }
         if (applyFiltersBtn) {
             applyFiltersBtn.addEventListener('click', () => {
+                // Read values from inputs
+                const searchTextEl = document.getElementById('filterSearchText');
+                if(searchTextEl) activeFilters.searchText = searchTextEl.value;
+
                 activeFilters.brand = document.getElementById('filterBrand').value;
+                activeFilters.condition = document.getElementById('filterCondition').value; // Added
                 activeFilters.battery = document.getElementById('filterBattery').value;
                 activeFilters.module = document.getElementById('filterModule').value;
                 activeFilters.material = document.getElementById('filterMaterial').value;
                 activeFilters.movement = document.getElementById('filterMovement').value;
                 activeFilters.location = document.getElementById('filterLocation').value;
+                
                 filterModal.classList.remove('active');
                 refreshView();
             });
