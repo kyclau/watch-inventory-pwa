@@ -33,6 +33,15 @@ body {
     color: #C1A981; /* Gravy */
 }
 
+.header-logo {
+    height: 1em; /* Matches the exact height of the text font */
+    width: auto; /* Keeps aspect ratio */
+    vertical-align: middle; /* Aligns center with text */
+    margin-right: 8px; /* Space between logo and text */
+    margin-bottom: 2px; /* Fine-tune alignment if needed */
+    display: inline-block;
+}
+
 .btn-add {
     background: #C1A981; /* Gravy Background */
     color: #000000; /* Black Text */
