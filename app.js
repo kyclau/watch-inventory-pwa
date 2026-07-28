@@ -559,7 +559,7 @@ function setupEventListeners() {
         refreshView();
     });
 
-    // NEW: Filter Modal Events
+    // --- FILTER MODAL LISTENERS (FIXED: Removed Duplicates) ---
     const openFilterBtn = document.getElementById('openFilterBtn');
     const closeFilterBtn = document.getElementById('closeFilterBtn');
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
@@ -567,8 +567,15 @@ function setupEventListeners() {
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const clearFiltersFromEmpty = document.getElementById('clearFiltersFromEmpty');
 
-    // ✅ FIX: Only run this if filterModal actually exists in HTML
-    if (filterModal) { 
+    // Helper function defined here so it's accessible
+    function resetFilters() {
+        activeFilters = { brand: '', battery: '', module: '', material: '', movement: '', location: '' };
+        if (filterModal) filterModal.classList.remove('active');
+        refreshView();
+    }
+
+    // Only attach if the modal exists in HTML
+    if (filterModal) {
         if (clearFiltersFromEmpty) clearFiltersFromEmpty.addEventListener('click', resetFilters);
 
         if (openFilterBtn) {
@@ -609,47 +616,18 @@ function setupEventListeners() {
         });
     }
 
-    // Helper function (keep this outside or inside, but ensure it checks filterModal too)
-    function resetFilters() {
-        activeFilters = { brand: '', battery: '', module: '', material: '', movement: '', location: '' };
-        if (filterModal) filterModal.classList.remove('active');
-        refreshView();
-    }
-    if (closeFilterBtn) {
-        closeFilterBtn.addEventListener('click', () => filterModal.classList.remove('active'));
-    }
-    if (applyFiltersBtn) {
-        applyFiltersBtn.addEventListener('click', () => {
-            activeFilters.brand = document.getElementById('filterBrand').value;
-            activeFilters.battery = document.getElementById('filterBattery').value;
-            activeFilters.module = document.getElementById('filterModule').value;
-            activeFilters.material = document.getElementById('filterMaterial').value;
-            activeFilters.movement = document.getElementById('filterMovement').value;
-            activeFilters.location = document.getElementById('filterLocation').value;
-            filterModal.classList.remove('active');
-            refreshView();
-        });
-    }
-    if (resetFiltersBtn) {
-        resetFiltersBtn.addEventListener('click', resetFilters);
-    }
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', resetFilters);
-    }
-    if (filterModal) {
-        filterModal.addEventListener('click', (e) => {
-            if (e.target === filterModal) filterModal.classList.remove('active');
-        });
+    // --- IMAGE INPUT LISTENER (FIXED: Prevent Double Execution) ---
+    const imagesInput = document.getElementById('images');
+    if (imagesInput) {
+        // 1. Clone to remove old listeners
+        const newInput = imagesInput.cloneNode(true);
+        imagesInput.parentNode.replaceChild(newInput, imagesInput);
+        
+        // 2. Attach fresh listener
+        newInput.addEventListener('change', handleImageSelect);
     }
 
-    // NEW: Reset Filters Function (Add this helper function inside setupEventListeners or globally)
-    function resetFilters() {
-        activeFilters = { brand: '', battery: '', module: '', material: '', movement: '', location: '' };
-        filterModal.classList.remove('active');
-        refreshView();
-    }
-
-    // Brand other input toggle
+    // --- OTHER FORM LISTENERS ---
     document.getElementById('brand').addEventListener('change', function() {
         const otherInput = document.getElementById('brandOther');
         if (this.value === 'Others (Specify)') {
@@ -662,14 +640,40 @@ function setupEventListeners() {
         }
     });
 
-    // ✅ FIX: Ensure listener is only attached once
-    const imagesInput = document.getElementById('images');
-    if (imagesInput) {
-        // Remove any existing listener first to prevent duplicates
-        imagesInput.replaceWith(imagesInput.cloneNode(true));
-        const newInput = document.getElementById('images');
-        newInput.addEventListener('change', handleImageSelect);
-    }
+    document.getElementById('currency').addEventListener('change', function() {
+        document.getElementById('currencyOther').classList.toggle('hidden', this.value !== 'other');
+        calculateFinalPrice();
+    });
+
+    document.getElementById('price').addEventListener('input', calculateFinalPrice);
+
+    document.getElementById('caseMaterial').addEventListener('change', function() {
+        const otherInput = document.getElementById('caseMaterialOther');
+        if (this.value === 'Other (Specify)') {
+            otherInput.classList.remove('hidden');
+            otherInput.required = true;
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.required = false;
+            otherInput.value = '';
+        }
+    });
+
+    document.getElementById('battery').addEventListener('change', function() {
+        document.getElementById('batteryOther').classList.toggle('hidden', this.value !== 'Other');
+    });
+
+    document.getElementById('movement').addEventListener('change', function() {
+        const otherInput = document.getElementById('movementOther');
+        if (this.value === 'Others (Specify)') {
+            otherInput.classList.remove('hidden');
+            otherInput.required = true;
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.required = false;
+            otherInput.value = '';
+        }
+    });
     
     // Currency other input toggle
     document.getElementById('currency').addEventListener('change', function() {
@@ -750,37 +754,42 @@ function setupEventListeners() {
 // Image handling
 let selectedImages = [];
 
-// ✅ FIXED: Single, clean function
+// Global flag to prevent double processing
+let isProcessingImage = false;
+
 async function handleImageSelect(e) {
-    const files = e.target.files;
+    // Prevent double execution if event fires twice
+    if (isProcessingImage) {
+        console.log('⚠️ Already processing an image, ignoring duplicate event.');
+        return;
+    }
     
+    const files = e.target.files;
     console.log('📸 FILE SELECTED! Files found:', files ? files.length : 0);
 
     if (!files || files.length === 0) {
-        // This log will now only appear if you genuinely cancel the file picker
-        console.log('⚠️ No files in event (User cancelled or input empty).');
+        console.log('⚠️ No files in event.');
         return;
     }
 
-    // Process files
+    isProcessingImage = true; // LOCK
     console.log(`✅ Processing ${files.length} new file(s)...`);
 
-    for (let i = 0; i < files.length; i++) {
-        try {
+    try {
+        for (let i = 0; i < files.length; i++) {
             const base64 = await fileToBase64(files[i]);
             selectedImages.push(base64);
             console.log(`➕ Added image. Total: ${selectedImages.length}`);
-        } catch (err) {
-            console.error('❌ Error converting file:', err);
         }
+        
+        renderImagePreview();
+        console.log('🎨 Preview rendered.');
+    } catch (err) {
+        console.error('❌ Error converting file:', err);
+    } finally {
+        isProcessingImage = false; // UNLOCK
+        e.target.value = ''; // Reset input
     }
-    
-    // Render Preview
-    renderImagePreview();
-    console.log('🎨 Preview rendered.');
-
-    // ✅ Reset input value so the same file can be selected again if deleted and re-added
-    e.target.value = ''; 
 }
 
 // ✅ NEW: Helper to render the preview with delete/reorder buttons
