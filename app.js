@@ -675,47 +675,6 @@ function setupEventListeners() {
         }
     });
     
-    // Currency other input toggle
-    document.getElementById('currency').addEventListener('change', function() {
-        document.getElementById('currencyOther').classList.toggle('hidden', this.value !== 'other');
-        calculateFinalPrice(); // Trigger calculation on currency change
-    });
-
-    // Trigger calculation on price input
-    document.getElementById('price').addEventListener('input', calculateFinalPrice);
-
-    // Case Material other input toggle
-    // Case Material other input toggle
-    document.getElementById('caseMaterial').addEventListener('change', function() {
-        const otherInput = document.getElementById('caseMaterialOther');
-        if (this.value === 'Other (Specify)') {
-            otherInput.classList.remove('hidden');
-            otherInput.required = true;
-        } else {
-            otherInput.classList.add('hidden');
-            otherInput.required = false;
-            otherInput.value = '';
-        }
-    });
-
-    // Battery other input toggle
-    document.getElementById('battery').addEventListener('change', function() {
-        document.getElementById('batteryOther').classList.toggle('hidden', this.value !== 'Other');
-    });
-
-    // Movement other input toggle
-    document.getElementById('movement').addEventListener('change', function() {
-        const otherInput = document.getElementById('movementOther');
-        if (this.value === 'Others (Specify)') {
-            otherInput.classList.remove('hidden');
-            otherInput.required = true;
-        } else {
-            otherInput.classList.add('hidden');
-            otherInput.required = false;
-            otherInput.value = '';
-        }
-    });
-
     // Close modal on outside click
     watchModal.addEventListener('click', (e) => {
         if (e.target === watchModal) closeAddModal();
