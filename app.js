@@ -726,90 +726,6 @@ async function handleImageSelect(e) {
     e.target.value = ''; 
 }
 
-function renderImagePreview() {
-    imagePreview.innerHTML = '';
-    
-    if (selectedImages.length === 0) return;
-
-    selectedImages.forEach((imgSrc, index) => {
-        const container = document.createElement('div');
-        container.style.position = 'relative';
-        container.style.display = 'inline-block';
-        container.style.margin = '5px';
-
-        const img = document.createElement('img');
-        img.src = imgSrc;
-        img.style.width = '60px';
-        img.style.height = '60px';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '5px';
-        img.style.border = '2px solid #C1A981';
-        img.style.cursor = 'pointer';
-        img.title = 'Click to move to front';
-        
-        // REORDER LOGIC: Click to move to position 0
-        img.addEventListener('click', () => {
-            if (index === 0) return; 
-            // Remove from current spot
-            const movedItem = selectedImages.splice(index, 1)[0];
-            // Add to front
-            selectedImages.unshift(movedItem);
-            // Re-render
-            renderImagePreview();
-        });
-
-        // Number Badge
-        const badge = document.createElement('span');
-        badge.textContent = index + 1;
-        badge.style.position = 'absolute';
-        badge.style.top = '-5px';
-        badge.style.left = '-5px';
-        badge.style.background = '#C1A981';
-        badge.style.color = '#000';
-        badge.style.fontSize = '10px';
-        badge.style.fontWeight = 'bold';
-        badge.style.width = '18px';
-        badge.style.height = '18px';
-        badge.style.borderRadius = '50%';
-        badge.style.display = 'flex';
-        badge.style.alignItems = 'center';
-        badge.style.justifyContent = 'center';
-        badge.style.pointerEvents = 'none';
-
-        // Delete Button
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '×';
-        deleteBtn.style.position = 'absolute';
-        deleteBtn.style.top = '-5px';
-        deleteBtn.style.right = '-5px';
-        deleteBtn.style.background = '#F21E4A';
-        deleteBtn.style.color = 'white';
-        deleteBtn.style.border = 'none';
-        deleteBtn.style.borderRadius = '50%';
-        deleteBtn.style.width = '18px';
-        deleteBtn.style.height = '18px';
-        deleteBtn.style.cursor = 'pointer';
-        deleteBtn.style.fontSize = '14px';
-        deleteBtn.style.lineHeight = '1';
-        deleteBtn.style.display = 'flex';
-        deleteBtn.style.alignItems = 'center';
-        deleteBtn.style.justifyContent = 'center';
-        
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent moving the image
-            if(confirm('Remove this image?')) {
-                selectedImages.splice(index, 1);
-                renderImagePreview();
-            }
-        });
-
-        container.appendChild(img);
-        container.appendChild(badge);
-        container.appendChild(deleteBtn);
-        imagePreview.appendChild(container);
-    });
-}
-
 // NEW HELPER FUNCTION: Render Preview with Reorder Logic
 function renderImagePreview() {
     imagePreview.innerHTML = '';
@@ -878,11 +794,10 @@ function openAddModal() {
     editingWatchId = null;
     document.getElementById('modalTitle').textContent = 'Add Watch';
     watchForm.reset();
-   // Load existing images into our working array
-    selectedImages = watch.images ? [...watch.images] : [];
     
-    // Render them immediately so user sees them
-    renderImagePreview();
+    // Reset for new watch
+    selectedImages = []; 
+    imagePreview.innerHTML = '';
     
     watchModal.classList.add('active');
 }
@@ -1200,8 +1115,12 @@ function editCurrentWatch() {
     document.getElementById('description').value = watch.description || '';
     document.getElementById('purchasedDate').value = watch.purchasedDate || '';
 
-    selectedImages = [];
-    imagePreview.innerHTML = '';
+    // FIX: Load existing images into the working array
+    selectedImages = watch.images ? [...watch.images] : [];
+    
+    // Render them so the user sees them
+    renderImagePreview();
+    
     watchModal.classList.add('active');
 }
 
