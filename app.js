@@ -535,8 +535,14 @@ function render() {
 
 // Setup event listeners
 function setupEventListeners() {
-    addWatchBtn.addEventListener('click', () => openAddModal());
-    emptyAddBtn.addEventListener('click', () => openAddModal());
+    // Add safety check for addWatchBtn
+    if (addWatchBtn) {
+        addWatchBtn.addEventListener('click', () => openAddModal());
+    }
+    
+    if (emptyAddBtn) {
+        emptyAddBtn.addEventListener('click', () => openAddModal());
+    }
     document.getElementById('closeModal').addEventListener('click', closeAddModal);
     document.getElementById('cancelBtn').addEventListener('click', closeAddModal);
     document.getElementById('closeDetail').addEventListener('click', closeDetailModal);
