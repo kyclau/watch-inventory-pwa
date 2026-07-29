@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kl-watch-cabinet-v9'; 
+const CACHE_NAME = 'kl-watch-cabinet-v10'; 
 const ASSETS = [
     '/',
     '/index.html',
