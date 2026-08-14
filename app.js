@@ -1033,7 +1033,7 @@ function editCurrentWatch() {
     
     // Set currency
     const currencySelect = document.getElementById('currency');
-    const knownCurrencies = ['HKD', 'USD', 'EUR', 'GBP', 'JPY'];
+    const knownCurrencies = ['HKD', 'USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'];
     if (knownCurrencies.includes(watch.currency)) {
         currencySelect.value = watch.currency;
         document.getElementById('currencyOther').classList.add('hidden');
